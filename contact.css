@@ -1,0 +1,99 @@
+/* Reset */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Clean Professional Background */
+body{
+    background: #0b0f19; /* deep navy */
+    color: #e5e7eb;
+}
+
+/* Navbar */
+.navbar{
+    text-align: center;
+    padding: 25px;
+    background: #111827;
+    border-bottom: 1px solid #1f2937;
+}
+
+.navbar h1{
+    font-size: 36px;
+    text-transform: uppercase;
+    color: #f9fafb;
+    letter-spacing: 2px;
+}
+
+.navbar p{
+    font-size: 16px;
+    color: #9ca3af;
+}
+
+/* Section Cards */
+.founder, .ceo, .ca{
+    width: 80%;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 12px;
+    background: #111827;
+    border: 1px solid #1f2937;
+    transition: all 0.3s ease;
+}
+
+/* Smooth Hover (no heavy glow) */
+.founder:hover, .ceo:hover, .ca:hover{
+    transform: translateY(-5px);
+    border-color: #244b9e;
+}
+
+/* Headings */
+h2{
+    color: #60a5fa; /* soft blue */
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+h3{
+    margin-top: 15px;
+    color: #fbbf24; /* subtle gold */
+}
+
+/* Text */
+p{
+    margin: 6px 0;
+    font-size: 15px;
+    color: #d1d5db;
+}
+
+/* Subtle animation */
+.founder, .ceo, .ca{
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s ease forwards;
+}
+
+.ceo{
+    animation-delay: 0.3s;
+}
+
+.ca{
+    animation-delay: 0.6s;
+}
+
+@keyframes fadeUp{
+    to{
+        opacity: 1.5;
+        transform-style: preserve-3d;
+    }
+}
+
+#border{
+    border-style: double;
+   height: 20%;
+    font-size: larger;
+    text-align: center;
+    background-color: #715e2f;
+}
