@@ -8,14 +8,17 @@
 
 /* Animated Gradient Background */
 body{
-    height: 100vh;
+    min-height: 100vh; /* FIX 1: Changed from height to min-height so it expands if content overflows */
     display: flex;
+    flex-direction: column; /* FIX 2: Arranges .c1 and #ad vertically instead of smashing them side-by-side */
     justify-content: center;
     align-items: center;
+    gap: 30px; /* Adds nice spacing between your glass card and your admin card */
+    padding: 40px 20px; /* Ensures space on mobile screens at the top and bottom */
     background: linear-gradient(-45deg, #1e3c72, #2a5298, #0f2027, #203a43);
     background-size: 400% 400%;
     animation: gradientMove 10s ease infinite;
-    overflow: hidden;
+    overflow-y: auto; /* FIX 3: Changed from hidden to auto so your mouse scroll wheel works perfectly! */
 }
 
 /* Gradient Animation */
@@ -105,4 +108,67 @@ button a{
     text-decoration: none;
     color: white;
     font-weight: bold;
+}
+
+
+/* Target only the admin section using its ID */
+#ad {
+    /* Replace the solid dark background with the glass effect */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Soft glass border instead of yellow */
+    
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+}
+
+/* MOUSE INTERACTION: This makes the admin block slide UP smoothly when hovered */
+#ad:hover {
+    transform: translateY(-10px); 
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6); /* Makes the shadow deeper as it lifts */
+}
+
+/* Style the warning text */
+#ad p {
+    color: #ffcc00;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Style the button container */
+#ad button {
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 4px;
+    padding: 0; 
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Style the link inside the button */
+#ad button a {
+    display: inline-block;
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 2px;
+    padding: 12px 35px;
+}
+
+/* Hover and active effects for the internal button */
+#ad button:hover {
+    background-color: #ffe066;
+    transform: translateY(-2px);
+}
+
+#ad button:active {
+    transform: translateY(0);
 }

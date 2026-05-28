@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAST GO | Control Panel Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <div id="adminAuthOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <h2><i class="fa-solid fa-lock"></i> Admin Access</h2>
+            <p>Enter the master security PIN to manage live platform data.</p>
+            <input type="password" id="adminPinInput" placeholder="Enter Admin Passcode">
+            <button onclick="verifyAdminAccess()">Unlock Dashboard</button>
+            <p id="authErrorMsg" class="error-text"></p>
+        </div>
+    </div>
+
+    <div class="admin-wrapper" id="adminMainContent" style="display: none;">
+        
+        <div class="sidebar">
+            <h2><i class="fa-solid fa-bolt"></i> FAST GO</h2>
+            <p class="nav-item active" onclick="switchTab('overview')"><i class="fa-solid fa-chart-line"></i> Overview</p>
+            <p class="nav-item" onclick="switchTab('users')"><i class="fa-solid fa-users"></i> Manage Users</p>
+            <p class="nav-item" onclick="switchTab('riders')"><i class="fa-solid fa-motorcycle"></i> Manage Riders</p>
+            <p class="nav-item" onclick="switchTab('config')"><i class="fa-solid fa-sliders"></i> System Config</p>
+            <button class="logout-btn" onclick="lockAdminPanel()"><i class="fa-solid fa-power-off"></i> Lock Panel</button>
+        </div>
+
+        <div class="main-workspace">
+            <div class="topbar">
+                <h1>Live Admin Control Panel</h1>
+                <div class="admin-profile">Master Admin <i class="fa-solid fa-user-shield"></i></div>
+            </div>
+
+            <div id="tab-overview" class="tab-content active">
+                <div class="stat-cards">
+                    <div class="card">
+                        <h3><i class="fa-solid fa-user"></i> Total Active Users</h3>
+                        <h2 id="stat-total-users">0</h2>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fa-solid fa-id-card"></i> Registered Riders</h3>
+                        <h2 id="stat-total-riders">0</h2>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fa-solid fa-building-columns"></i> Company Earnings</h3>
+                        <h2 id="stat-company-wallet">₹0</h2>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <h3>Recent Operations Activity Log</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data Scope Key</th>
+                                    <th>Status Value Preview</th>
+                                    <th>Action Scope</th>
+                                </tr>
+                            </thead>
+                            <tbody id="storageKeysLog">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-users" class="tab-content">
+                <div class="action-bar">
+                    <h3>Registered User Base</h3>
+                    <button class="add-btn" onclick="promptAddUser()"><i class="fa-solid fa-plus"></i> Add New User Manual</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mobile Number (Key)</th>
+                                <th>Full Name Registered</th>
+                                <th>Verified State</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-riders" class="tab-content">
+                <div class="action-bar">
+                    <h3>Rider Fleet Operations</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rider Phone</th>
+                                <th>Name</th>
+                                <th>Vehicle Class</th>
+                                <th>License Plate Number</th>
+                                <th>Wallet Balance</th>
+                                <th>Modify Balance</th>
+                                <th>Drop Rider</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ridersTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-config" class="tab-content">
+                <h3>Live Configuration Overrides</h3>
+                <p style="color: #9ca3af; margin-bottom: 20px;">Inject specific text string notices or structural system modifiers globally down to consumer runtime layers.</p>
+                
+                <div class="config-form">
+                    <div class="form-group">
+                        <label>Live Banner Alert Notice Message (Appears on client screen alerts if checked):</label>
+                        <input type="text" id="cfgSystemNotice" placeholder="Welcome to FAST GO Ride Hailing system...">
+                    </div>
+                    <div class="form-group">
+                        <label>Base Global Master Passcode Override PIN:</label>
+                        <input type="text" id="cfgAdminPin" value="9999">
+                    </div>
+                    <button class="save-btn" onclick="saveSystemConfigurations()">Commit Upstream Variable Changes Live</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<div class=\"table\">
+        <h3>Recent book ride</h3>
+        <table>
+            </table>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
