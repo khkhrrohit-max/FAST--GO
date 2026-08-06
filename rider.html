@@ -5,33 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RIDER </title>
     <link rel="stylesheet" href="rider.css">
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-(function(){
-    emailjs.init("R3UuwYlJAKMp78FFR");
-})();
-</script>
+ 
+
 </head>
 <body>
     <div class="c1">
         <h1> SIGN IN BY RIDER </h1>
 
-    <input type="text" placeholder="ENTER YOUR NAME">
-    <button>ENTER</button>
+    <input type="text" id="riderName"   placeholder="ENTER YOUR NAME">
+    
     <br>
     <br>
    
-    <input type="number" placeholder="ENTER YOUR NUMBER">
-    <button>GET OTP</button>
+    <input type="tel"id="riderNumber" placeholder="ENTER YOUR NUMBER">
     <br>
-    <br>
-   
-    <input type="number" placeholder="ENTER OTP">
-    <button>VERFIEY</button>
-    <br>
-    <br>
+<br>
+<input type="email" id="riderEmail" placeholder="ENTER YOUR EMAIL">
+    <button id="getOtpBtn">GET OTP</button>
+    <input
+type="text"
+id="riderOtp"
+placeholder="ENTER OTP">
 
-   <select name="city" id="city"> 
+<button id="verifyOtpBtn">VERIFY</button>
+    
+    <br>
+    <br>
+   
+    
+
+   <select id="vehicleType">
 <option value="BIKE"> BIKE </option>
 <option value="AUTO"> AUTO </option>
 <option value="TAXI">  TAXI </option>
@@ -40,8 +43,9 @@
 <br>
     <br>
    
-<input type="password" placeholder="ENTER PLATE NUMBER">
-<button>VERFIEY</button>
+<input type="text" id="plateNumber" placeholder="ENTER PLATE NUMBER">
+
+<button id="verifyPlateBtn">VERIFY</button>
 <br>
     <br>
     <div class="vechile_image">
@@ -69,6 +73,7 @@
     <button>VERFIEY</button>
     <br>
  </div>
+ 
 <br>
 <div class="car_doc">
     <input type="file">
@@ -88,7 +93,7 @@
          <p>मैं पुष्टि करता/करती हूँ कि मेरे द्वारा दिए गए वाहन दस्तावेज और ड्राइविंग लाइसेंस वैध और सही हैं।</p>
     <button type="button" id="submitBtn">SUBMIT</button>
         </div>
-    
-    <script src="rider.js"></script>
+    <div id="recaptcha-container"></div>
+    <script type="module" src="rider.js"></script>
 </body>
 </html>
