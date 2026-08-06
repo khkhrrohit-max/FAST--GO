@@ -12,14 +12,19 @@
         <h1>LOGIN ACCOUNT</h1>
 
         <input type="text" id="loginNumber" placeholder="Enter Your MOBILE">
+        <br>
+<br>
+<input type="email" id="loginEmail" placeholder="ENTER YOUR EMAIL">
 <button id="getOtpBtn">GET OTP</button>
 
 <input type="text" id="loginOtp" placeholder="Enter Your OTP">
-
+<button id="verifyOtpBtn">VERIFY OTP</button>
 <button id="loginBtn">LOGIN</button>
+
 
         <p>Don't have an account? <a href="rider.html">SIGN IN</a></p>
     </div>
-<script src="loginrider.js"></script>
+    <div id="recaptcha-container"></div>
+<script type="module" src="loginrider.js"></script>
 </body>
 </html>
