@@ -74,7 +74,7 @@ if(signupBtn){
             return;
         }
 
-        if(localStorage.getItem(number)){
+      if(localStorage.getItem("user_" + number)){
             alert("Already Registered");
             return;
         }
@@ -127,7 +127,7 @@ if(signupBtn){
 
         };
 
-        localStorage.setItem(user.number,JSON.stringify(user));
+localStorage.setItem("user_" + user.number, JSON.stringify(user));
 
         alert("Signup Successful");
 
@@ -162,7 +162,7 @@ if(loginBtn){
             return;
         }
 
-        const user=JSON.parse(localStorage.getItem(number));
+        const user = JSON.parse(localStorage.getItem("user_" + number));
 
         if(!user){
             alert("User Not Registered");
@@ -218,16 +218,18 @@ if(loginBtn){
 
         }
 
-        const number=document.getElementById("loginNumber").value.trim();
+        const number = document.getElementById("loginNumber").value.trim();
 
-        localStorage.setItem(
-            "loggedInUser",
-            localStorage.getItem(number)
-        );
+const user = JSON.parse(localStorage.getItem("user_" + number));
 
-        alert("Login Successful");
+localStorage.setItem(
+    "loggedInUser",
+    JSON.stringify(user)
+);
 
-        location.href="useryour.html";
+alert("Login Successful");
+
+location.href = "useryour.html";
 
     });
 
