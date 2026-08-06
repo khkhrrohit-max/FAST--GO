@@ -1,151 +1,234 @@
-// ================= GLOBAL =================
-let currentNumber = "";
+import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm";
+
+
+
+emailjs.init({
+    publicKey: "oJsKfBhacylKGQmXb"
+});
+
+
+
 let generatedOTP = "";
+let otpExpireTime = 0;
 let otpVerified = false;
 
-
-// ================= VALIDATION =================
-function isValidIndianNumber(number) {
+function isValidIndianNumber(number){
     return /^[6-9]\d{9}$/.test(number);
 }
 
-
-// ================= SIGNUP PAGE =================
-const nameInput = document.getElementById("signupName");
-const numberInput = document.getElementById("signupNumber");
-const otpInput = document.getElementById("signupOtp");
-
-const getOtpBtn = document.getElementById("signupGetOtp");
-const verifyBtn = document.getElementById("signupVerify");
-
-
-if (getOtpBtn) {
-
-getOtpBtn.addEventListener("click", () => {
-
-const name = nameInput.value.trim();
-const number = numberInput.value.trim();
-
-if (name === "") {
-alert("Enter your name");
-return;
+function isValidEmail(email){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-if (!isValidIndianNumber(number)) {
-alert("Enter valid Indian mobile number");
-return;
+function generateOTP(){
+    return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-if (localStorage.getItem(number)) {
-alert("⚠ Number already exists! Please login.");
-return;
+async function sendOTP(email, otp){
+
+    alert("Sending OTP...");
+
+    const response = await emailjs.send(
+        "service_dti5zdd",
+        "template_omw4uus",
+        {
+            to_email: email,
+            otp: otp
+        }
+    );
+
+    alert("Email Sent");
+    return response;
 }
 
-currentNumber = number;
+/* ===========================
+        SIGNUP
+=========================== */
 
-// Generate OTP
-generatedOTP = Math.floor(100000 + Math.random() * 900000);
+const signupBtn = document.getElementById("signupGetOtp");
 
-// Show OTP in alert
-alert("Your OTP is: " + generatedOTP);
+if(signupBtn){
 
-});
+    
 
+    signupBtn.addEventListener("click", async ()=>{
 
+        alert("Button Clicked");
 
-verifyBtn.addEventListener("click", () => {
+        const name=document.getElementById("signupName").value.trim();
+        const number=document.getElementById("signupNumber").value.trim();
+        const email=document.getElementById("signupEmail").value.trim();
 
-const enteredOTP = otpInput.value.trim();
+        if(name==""){
+            alert("Enter Name");
+            return;
+        }
 
-if (enteredOTP == generatedOTP) {
+        if(!isValidIndianNumber(number)){
+            alert("Invalid Mobile");
+            return;
+        }
 
-const userData = {
-name: nameInput.value.trim(),
-number: currentNumber
-};
+        if(!isValidEmail(email)){
+            alert("Invalid Email");
+            return;
+        }
 
-localStorage.setItem(currentNumber, JSON.stringify(userData));
+        if(localStorage.getItem(number)){
+            alert("Already Registered");
+            return;
+        }
 
-alert("Signup Successful 🎉");
+        generatedOTP=generateOTP();
 
-window.location.href = "login.html";
+        otpExpireTime=Date.now()+300000;
+
+        try{
+
+            await sendOTP(email,generatedOTP);
+
+            alert("OTP Sent");
+
+        }
+        catch(err){
+
+            alert(err.text || err.message || JSON.stringify(err));
+
+        }
+
+    });
+
+    document.getElementById("signupVerify").addEventListener("click",()=>{
+
+        const otp=document.getElementById("signupOtp").value.trim();
+
+        if(otp==""){
+            alert("Enter OTP");
+            return;
+        }
+
+        if(Date.now()>otpExpireTime){
+            alert("OTP Expired");
+            return;
+        }
+
+        if(otp!=generatedOTP){
+            alert("Wrong OTP");
+            return;
+        }
+
+        otpVerified=true;
+
+        const user={
+
+            name:document.getElementById("signupName").value.trim(),
+            number:document.getElementById("signupNumber").value.trim(),
+            email:document.getElementById("signupEmail").value.trim()
+
+        };
+
+        localStorage.setItem(user.number,JSON.stringify(user));
+
+        alert("Signup Successful");
+
+        location.href="login.html";
+
+    });
 
 }
-else{
-alert("Wrong OTP ❌");
-}
 
-});
+/* ===========================
+        LOGIN
+=========================== */
 
-}
+const loginBtn=document.getElementById("loginGetOtp");
 
+if(loginBtn){
 
-// ================= LOGIN PAGE =================
-if (window.location.pathname.includes("login")) {
+    
 
-const numberInput = document.getElementById("loginNumber");
-const otpInput = document.getElementById("loginOtp");
+    loginBtn.addEventListener("click",async()=>{
 
-const getOtpBtn = document.getElementById("loginGetOtp");
-const verifyBtn = document.getElementById("loginVerify");
-const loginBtn = document.getElementById("loginBtn");
+        const number=document.getElementById("loginNumber").value.trim();
+        const email=document.getElementById("loginEmail").value.trim();
 
+        if(!isValidIndianNumber(number)){
+            alert("Invalid Mobile");
+            return;
+        }
 
-getOtpBtn.addEventListener("click", () => {
+        if(!isValidEmail(email)){
+            alert("Invalid Email");
+            return;
+        }
 
-const number = numberInput.value.trim();
+        const user=JSON.parse(localStorage.getItem(number));
 
-if (!isValidIndianNumber(number)) {
-alert("Enter valid mobile number");
-return;
-}
+        if(!user){
+            alert("User Not Registered");
+            return;
+        }
 
-if (!localStorage.getItem(number)) {
-alert("Number not registered ❌");
-return;
-}
+        if(user.email!=email){
+            alert("Wrong Email");
+            return;
+        }
 
-currentNumber = number;
+        generatedOTP=generateOTP();
 
-// Generate OTP
-generatedOTP = Math.floor(100000 + Math.random() * 900000);
+        otpExpireTime=Date.now()+300000;
 
-// Show OTP
-alert("Your OTP is: " + generatedOTP);
+        try{
 
-});
+            await sendOTP(email,generatedOTP);
 
+            alert("OTP Sent");
 
-verifyBtn.addEventListener("click", () => {
+        }catch(err){
 
-const enteredOTP = otpInput.value.trim();
+            alert(err.text || err.message || JSON.stringify(err));
 
-if (enteredOTP == generatedOTP){
-otpVerified = true;
-alert("OTP Verified ✅");
-}
-else{
-alert("Wrong OTP ❌");
-}
+        }
 
-});
+    });
 
+    document.getElementById("loginVerify").addEventListener("click",()=>{
 
-loginBtn.addEventListener("click", () => {
+        const otp=document.getElementById("loginOtp").value.trim();
 
-if(!otpVerified){
-alert("Please verify OTP first");
-return;
-}
+        if(otp!=generatedOTP){
 
-const userData = JSON.parse(localStorage.getItem(currentNumber));
+            alert("Wrong OTP");
+            return;
 
-localStorage.setItem("loggedInUser", JSON.stringify(userData));
+        }
 
-alert("Login Successful 🎉");
+        otpVerified=true;
 
-window.location.href="useryour.html";
+        alert("OTP Verified");
 
-});
+    });
+
+    document.getElementById("loginBtn").addEventListener("click",()=>{
+
+        if(!otpVerified){
+
+            alert("Verify OTP First");
+            return;
+
+        }
+
+        const number=document.getElementById("loginNumber").value.trim();
+
+        localStorage.setItem(
+            "loggedInUser",
+            localStorage.getItem(number)
+        );
+
+        alert("Login Successful");
+
+        location.href="useryour.html";
+
+    });
 
 }
