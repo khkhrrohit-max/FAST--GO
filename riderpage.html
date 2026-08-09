@@ -1,105 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <title>Fast Go - Rider Panel</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="riderpage.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>
+        Fast Go - Rider Panel
+    </title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-<script>
-const supabaseUrl = "https://omvlctrwkbauxyoyxcrv.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tdmxjdHJ3a2JhdXh5b3l4Y3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NTQxMzIsImV4cCI6MjA4NzQzMDEzMn0.fY6yv_QjuDDtovHz4dHlGV71dvUBUsKo0Hz7dd09i2c";
 
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-</script>
+    <!-- YOUR CSS -->
 
-    <link rel="stylesheet"
-     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link
+        rel="stylesheet"
+        href="riderpage.css">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <!-- FontAwesome -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+    <!-- Leaflet -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+
+    <!-- Routing Machine -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+
 </head>
+
 
 <body>
 
-<!-- ================= RIDER NAVBAR ================= -->
-<header class="navbar">
-    <div class="logo">
-        <img src="fast go.png" alt="Fast Go Logo">
-        <h2>FAST GO RIDER</h2>
-    </div>
 
-    <nav>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="#earnings">Earnings</a>
-        <a href="#rides">My Rides</a>
-        <a href="rider.html">SIGN UP</a>
-        <a href="index2.html">Logout</a>
-        <a href="YOUR.HTML">YOUR</a>
-    </nav>
-</header>
-<!-- ================= WALLET SECTION ================= -->
-<div class="wallet-card">
-    <h2>💰 FAST GO Wallet</h2>
+    <!-- ================= NAVBAR ================= -->
 
-   <a href="walllet.html">BALANCE</a>
-</div>
+    <header class="navbar">
 
-<!-- ================= HERO ================= -->
-<section class="hero">
-    <div class="hero-content">
-        <h1>Drive & Earn With Fast Go</h1>
-        <p>Accept rides and grow your income</p>
+        <div class="logo">
 
-        <div class="rider-box">
-            <h3>Current Status</h3>
-            <p id="status">Offline</p>
-            <button onclick="toggleStatus()">Go Online</button>
+            <img
+                src="fast go.png"
+                alt="Fast Go Logo">
+
+            <h2>
+                FAST GO RIDER
+            </h2>
+
         </div>
-        <div id="mapContainer" style="height:400px; margin:20px;"></div>
+
+
+        <nav>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="#earnings">
+                Earnings
+            </a>
+
+            <a href="#rides">
+                My Rides
+            </a>
+
+            <a href="rider.html">
+                SIGN UP
+            </a>
+
+            <a href="index2.html">
+                Logout
+            </a>
+
+            <a href="YOUR.HTML">
+                YOUR
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= WALLET ================= -->
+
+    <div class="wallet-card">
+
+        <h2>
+            💰 FAST GO Wallet
+        </h2>
+
+        <a href="walllet.html">
+            BALANCE
+        </a>
+
+        <p>
+            Balance:
+            ₹<span id="walletBalance">0</span>
+        </p>
+
     </div>
-</section>
 
-<!-- ================= RIDES SECTION ================= -->
-<section class="rides" id="rides">
-    <h2>Available Rides</h2>
 
-    <div class="ride-card">
-        <p><strong>Pickup:</strong> City Center</p>
-        <p><strong>Drop:</strong> Railway Station</p>
-        <p><strong>Fare:</strong> ₹250</p>
-        <button onclick="acceptRide(24.8170,93.9368,24.8000,93.9500,250)">
-            Accept Ride
-        </button>
-    </div>
+    <!-- ================= HERO ================= -->
 
-    <div class="ride-card">
-        <p><strong>Pickup:</strong> Mall Road</p>
-        <p><strong>Drop:</strong> Airport</p>
-        <p><strong>Fare:</strong> ₹480</p>
-        <button onclick="acceptRide(24.8200,93.9400,24.7600,93.8900,480)">
-            Accept Ride
-        </button>
-    </div>
-</section>
+    <section class="hero">
 
-<!-- ================= FOOTER ================= -->
-<footer>
-    <pre>© 2026 Fast Go Rider Panel | 
-     Designed by Rohit Khokhar
+        <div class="hero-content">
 
-    EMAIL :- khkhrrohit@gmail.com
+            <h1>
+                Drive & Earn With Fast Go
+            </h1>
 
-phone no. :- 8099317347
-</pre>
-</footer>
+            <p>
+                Accept rides and grow your income
+            </p>
 
-<script src="riderpage.js"></script>
+
+            <!-- RIDER STATUS -->
+
+            <div class="rider-box">
+
+                <h3>
+                    Current Status
+                </h3>
+
+                <p id="status">
+                    Offline
+                </p>
+
+                <button
+                    id="toggleStatusBtn"
+                    type="button">
+
+                    Go Online
+
+                </button>
+
+            </div>
+
+
+            <!-- MAP -->
+
+            <div
+                id="mapContainer"
+                style="height:400px; margin:20px;">
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= RIDES ================= -->
+
+    <section
+        class="rides"
+        id="rides">
+
+        <h2>
+            Available Rides
+        </h2>
+
+
+        <!-- NO REQUEST -->
+
+        <div
+            id="noRideMessage">
+
+            <p>
+                No new ride requests.
+            </p>
+
+        </div>
+
+
+        <!-- RIDE REQUEST -->
+
+        <div
+            id="rideRequestCard"
+            class="ride-card"
+            style="display:none;">
+
+            <h3>
+                🚕 New Ride Request
+            </h3>
+
+
+            <p>
+                <strong>
+                    Passenger Name:
+                </strong>
+
+                <span id="requestUserName">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                <strong>
+                    Passenger Mobile:
+                </strong>
+
+                <span id="requestUserPhone">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                <strong>
+                    Pickup:
+                </strong>
+
+                <span id="requestPickup">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                <strong>
+                    Destination:
+                </strong>
+
+                <span id="requestDrop">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                <strong>
+                    Vehicle:
+                </strong>
+
+                <span id="requestVehicle">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                <strong>
+                    Fare:
+                </strong>
+
+                ₹<span id="requestFare">
+                    0
+                </span>
+            </p>
+
+
+            <p>
+                <strong>
+                    Distance:
+                </strong>
+
+                <span id="requestDistance">
+                    0
+                </span>
+                KM
+            </p>
+
+
+            <div>
+
+                <button
+                    id="acceptBtn"
+                    type="button">
+
+                    Accept Ride
+
+                </button>
+
+
+                <button
+                    id="rejectBtn"
+                    type="button">
+
+                    Reject Ride
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= ACTIVE RIDE ================= -->
+
+        <div
+            id="activeRideCard"
+            class="ride-card"
+            style="display:none;">
+
+            <h3>
+                🚗 Active Ride
+            </h3>
+
+
+            <p>
+                Passenger:
+                <span id="activeUserName">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                Mobile:
+                <span id="activeUserPhone">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                Pickup:
+                <span id="activePickup">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                Destination:
+                <span id="activeDrop">
+                    -
+                </span>
+            </p>
+
+
+            <p>
+                Fare:
+                ₹<span id="activeFare">
+                    0
+                </span>
+            </p>
+
+
+            <p>
+                Status:
+                <span id="activeRideStatus">
+                    Accepted
+                </span>
+            </p>
+
+
+            <button
+                id="completeRideBtn"
+                type="button">
+
+                Complete Ride
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            © 2026 Fast Go Rider Panel
+        </p>
+
+        <p>
+            Designed by Rohit Khokhar
+        </p>
+
+    </footer>
+
+
+    <!-- LEAFLET JS -->
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+
+    <!-- ROUTING JS -->
+
+    <script
+        src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js">
+    </script>
+
+
+    <!-- YOUR JS -->
+
+    <script
+        src="riderpage.js">
+    </script>
+
 </body>
+
 </html>
