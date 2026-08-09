@@ -1,361 +1,1385 @@
-// ================= GLOBAL VARIABLES =================
-let riderId;
+// ======================================================
+// FAST GO RIDER PAGE
+// NO SUPABASE VERSION
+// ======================================================
 
-let companyKey;
-let loggedInNumber = localStorage.getItem("loggedInRider");
-let walletKey = "wallet_" + loggedInNumber;
-// ================= INITIAL SETUP =================
-document.addEventListener("DOMContentLoaded", function () {
-
-    const urlParams = new URLSearchParams(window.location.search);
-
-    // Get rider phone from URL
-    riderId = urlParams.get("phone");
-
-    if (!riderId) {
-        alert("Rider not logged in properly");
-        return;
-    }
-
-    walletKey = "riderWallet_" + riderId;
-    companyKey = "fastGoCompanyAccount";
-
-    // INIT RIDER WALLET
-    if (!localStorage.getItem(walletKey)) {
-        localStorage.setItem(walletKey, JSON.stringify({ balance: 0 }));
-    }
-
-    // INIT COMPANY WALLET
-    if (!localStorage.getItem(companyKey)) {
-        localStorage.setItem(companyKey, JSON.stringify({ balance: 0 }));
-    }
-
-    checkWalletLimit();
- let wallet = JSON.parse(localStorage.getItem(walletKey));
-
-if (wallet && wallet.balance <= -500) {
-    disableAllRides();
-}
-});
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
 
-// ================= COMMISSION SYSTEM =================
-function processRidePayment(fareAmount, paymentMethod) {
+        // ==================================================
+        // ELEMENTS
+        // ==================================================
 
-    let wallet = JSON.parse(localStorage.getItem(walletKey));
-    let company = JSON.parse(localStorage.getItem(companyKey));
+        const statusText =
+            document.getElementById(
+                "status"
+            );
 
-    let commission = fareAmount * 0.25;
-    let riderShare = fareAmount * 0.75;
 
-    // ===== ONLINE PAYMENT =====
-    if (paymentMethod === "online") {
+        const toggleStatusBtn =
+            document.getElementById(
+                "toggleStatusBtn"
+            );
 
-        wallet.balance += riderShare;
-        company.balance += commission;
 
-        alert("Online Ride ✅\nCommission ₹" + commission + " deducted automatically.");
-    }
+        const rideRequestCard =
+            document.getElementById(
+                "rideRequestCard"
+            );
 
-    // ===== CASH PAYMENT =====
-    else if (paymentMethod === "cash") {
 
-        let newBalance = wallet.balance - commission;
+        const noRideMessage =
+            document.getElementById(
+                "noRideMessage"
+            );
 
-        // ❌ STOP IF BELOW -500
-        if (newBalance < -500) {
-            alert("⚠ Wallet limit -₹500 reached.\nRecharge Required.");
-            disableAcceptButton();
+
+        const activeRideCard =
+            document.getElementById(
+                "activeRideCard"
+            );
+
+
+        const acceptBtn =
+            document.getElementById(
+                "acceptBtn"
+            );
+
+
+        const rejectBtn =
+            document.getElementById(
+                "rejectBtn"
+            );
+
+
+        const completeRideBtn =
+            document.getElementById(
+                "completeRideBtn"
+            );
+
+
+        const walletBalance =
+            document.getElementById(
+                "walletBalance"
+            );
+
+
+        // ==================================================
+        // RIDER LOGIN
+        // ==================================================
+
+        let loggedInRider = null;
+
+
+        try {
+
+            loggedInRider =
+                JSON.parse(
+                    localStorage.getItem(
+                        "loggedInRider"
+                    )
+                );
+
+        } catch (error) {
+
+            loggedInRider = null;
+        }
+
+
+        if (!loggedInRider) {
+
+            alert(
+                "Please login as rider first."
+            );
+
+            window.location.href =
+                "loginrider.html";
+
             return;
         }
 
-        wallet.balance = newBalance;
-        company.balance += commission;
 
-        alert("Cash Ride ✅\nCommission ₹" + commission + " deducted.");
-    }
+        // ==================================================
+        // RIDER DATA
+        // ==================================================
 
-    localStorage.setItem(walletKey, JSON.stringify(wallet));
-    localStorage.setItem(companyKey, JSON.stringify(company));
-
-    checkWalletLimit();
-}
+        const riderPhone =
+            loggedInRider.number ||
+            loggedInRider.phone;
 
 
-// ================= NEGATIVE LIMIT CHECK =================
-function checkWalletLimit() {
-
-    let wallet = JSON.parse(localStorage.getItem(walletKey));
-
-    if (wallet && wallet.balance <= -500) {
-        disableAllRides();
-    }
-}
-
-// ================= DISABLE ACCEPT =================
-function disableAcceptButton() {
-
-    const acceptBtn = document.getElementById("acceptBtn");
-
-    if (acceptBtn) {
-        acceptBtn.disabled = true;
-        acceptBtn.innerText = "Recharge Required";
-        acceptBtn.style.backgroundColor = "gray";
-    }
-}
+        const riderName =
+            loggedInRider.name ||
+            "Rider";
 
 
-// ================= MAP SYSTEM =================
-// ================= GLOBAL MAP VARIABLES =================
-let map;
-let riderMarker;
-let userMarker;
-let routingControl;
-let watchId;
+        const riderVehicle =
+            loggedInRider.vehicle ||
+            "Bike";
 
-// ================= MAP SYSTEM =================
-document.addEventListener("DOMContentLoaded", function () {
 
-    map = L.map('mapContainer').setView([24.8170, 93.9368], 13);
+        const riderPlate =
+            loggedInRider.plate ||
+            "";
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: "© OpenStreetMap"
-    }).addTo(map);
 
-});
+        if (!riderPhone) {
 
-// ================= ONLINE / OFFLINE =================
-window.toggleStatus = function () {
+            alert(
+                "Rider mobile number not found."
+            );
 
-    const statusText = document.getElementById("status");
-    const button = document.querySelector(".rider-box button");
+            return;
+        }
 
-    let online = statusText.innerText.trim() === "Offline";
 
-    if (online) {
+        // ==================================================
+        // STORAGE KEYS
+        // ==================================================
 
-        statusText.innerHTML = "Online";
-        statusText.style.color = "green";
-        button.innerText = "Go Offline";
+        const activeRiderKey =
+            "activeRider_" +
+            riderPhone;
 
-        watchId = navigator.geolocation.watchPosition(function (pos) {
 
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
+        const requestKey =
+            "rideRequest_" +
+            riderPhone;
 
-            if (!riderMarker) {
-                riderMarker = L.marker([lat, lng])
-                    .addTo(map)
-                    .bindPopup("You (Rider)")
-                    .openPopup();
-            } else {
-                riderMarker.setLatLng([lat, lng]);
+
+        const walletKey =
+            "riderWallet_" +
+            riderPhone;
+
+
+        const companyKey =
+            "fastGoCompanyAccount";
+
+
+        // ==================================================
+        // WALLET
+        // ==================================================
+
+        let wallet =
+            getStorageObject(
+                walletKey
+            );
+
+
+        if (!wallet) {
+
+            wallet = {
+                balance: 0
+            };
+
+
+            saveStorageObject(
+                walletKey,
+                wallet
+            );
+        }
+
+
+        let company =
+            getStorageObject(
+                companyKey
+            );
+
+
+        if (!company) {
+
+            company = {
+                balance: 0
+            };
+
+
+            saveStorageObject(
+                companyKey,
+                company
+            );
+        }
+
+
+        updateWalletDisplay();
+
+
+        // ==================================================
+        // MAP
+        // ==================================================
+
+        const map =
+            L.map(
+                "mapContainer"
+            ).setView(
+                [23.8315, 91.2868],
+                6
+            );
+
+
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+
+                attribution:
+                    "© OpenStreetMap contributors",
+
+                maxZoom: 19
+
+            }
+        ).addTo(map);
+
+
+        let riderMarker = null;
+
+        let pickupMarker = null;
+
+        let dropMarker = null;
+
+        let routingControl = null;
+
+        let watchId = null;
+
+
+        // ==================================================
+        // ACTIVE RIDE
+        // ==================================================
+
+        let currentRide =
+            getStorageObject(
+                requestKey
+            );
+
+
+        // ==================================================
+        // HELPER FUNCTIONS
+        // ==================================================
+
+        function getStorageObject(
+            key
+        ) {
+
+            try {
+
+                return JSON.parse(
+                    localStorage.getItem(
+                        key
+                    )
+                );
+
+            } catch (error) {
+
+                return null;
+            }
+        }
+
+
+        function saveStorageObject(
+            key,
+            value
+        ) {
+
+            localStorage.setItem(
+                key,
+                JSON.stringify(
+                    value
+                )
+            );
+        }
+
+
+        // ==================================================
+        // WALLET DISPLAY
+        // ==================================================
+
+        function updateWalletDisplay() {
+
+            wallet =
+                getStorageObject(
+                    walletKey
+                ) || {
+                    balance: 0
+                };
+
+
+            walletBalance.textContent =
+                Number(
+                    wallet.balance
+                ).toFixed(2);
+        }
+
+
+        // ==================================================
+        // WALLET LIMIT
+        // ==================================================
+
+        function walletAllowed() {
+
+            wallet =
+                getStorageObject(
+                    walletKey
+                ) || {
+                    balance: 0
+                };
+
+
+            if (
+                wallet.balance <= -500
+            ) {
+
+                alert(
+                    "⚠ Wallet limit -₹500 reached. Please recharge."
+                );
+
+                return false;
             }
 
-            map.setView([lat, lng], 15);
 
-            // SAVE FOR USER PAGE
-            // Get real rider data
-let riderData = JSON.parse(localStorage.getItem("riderData_" + riderId));
-
-if (!riderData) {
-    alert("Rider data not found!");
-    return;
-}
-
-localStorage.setItem("activeRider_" + riderId, JSON.stringify({
-    phone: riderData.phone,
-    name: riderData.name,
-    vehicle: riderData.vehicle,
-    plate: riderData.plate,
-    lat: lat,
-    lng: lng,
-    online: true
-}));
-        });
-
-    } else {
-
-        statusText.innerHTML = "Offline";
-        statusText.style.color = "red";
-        button.innerText = "Go Online";
-
-        navigator.geolocation.clearWatch(watchId);
-
-        localStorage.removeItem("activeRider_" + riderId);
-
-        if (riderMarker) map.removeLayer(riderMarker);
-    }
-};
+            return true;
+        }
 
 
-// ================= ACCEPT RIDE =================
-window.acceptRide = function (pickupLat, pickupLng, dropLat, dropLng, fare) {
+        // ==================================================
+        // ONLINE / OFFLINE
+        // ==================================================
 
-    if (!riderMarker) {
-        alert("Go Online First!");
-        return;
-    }
+        toggleStatusBtn.addEventListener(
+            "click",
+            function () {
 
-    const requestKey = "rideRequest_" + riderId;
-
-    const rideRequest = {
-        pickup: "Pickup Location",
-        drop: "Drop Location",
-        fare: fare,
-        status: "accepted"
-    };
-
-    localStorage.setItem(requestKey, JSON.stringify(rideRequest));
-
-    localStorage.setItem("rideStatus_user", JSON.stringify({
-        status: "accepted",
-        rider: riderId
-    }));
-
-    // ===== MAP CODE (KEEP SAME) =====
-    if (userMarker) map.removeLayer(userMarker);
-
-    userMarker = L.marker([pickupLat, pickupLng])
-        .addTo(map)
-        .bindPopup("User Pickup Location")
-        .openPopup();
-
-    if (routingControl) map.removeControl(routingControl);
-
-    routingControl = L.Routing.control({
-        waypoints: [
-            riderMarker.getLatLng(),
-            L.latLng(pickupLat, pickupLng),
-            L.latLng(dropLat, dropLng)
-        ],
-        routeWhileDragging: false
-    }).addTo(map);
-
-    routingControl.on('routesfound', function (e) {
-        const route = e.routes[0];
-        const distance = (route.summary.totalDistance / 1000).toFixed(2);
-        alert("Ride Accepted 🚖\nDistance: " + distance + " KM");
-    });
-};
-function completeRide() {
-
-    const requestKey = "rideRequest_" + riderId;
-    const rideRequest = JSON.parse(localStorage.getItem(requestKey));
-
-    if (!rideRequest || rideRequest.status !== "accepted") {
-        alert("No active ride to complete!");
-        return;
-    }
-
-    let fare = parseFloat(rideRequest.fare);
-    let commission = fare * 0.25;
-
-    let wallet = JSON.parse(localStorage.getItem(walletKey));
-
-    // Deduct commission
-    wallet.balance -= commission;
-
-    localStorage.setItem(walletKey, JSON.stringify(wallet));
-
-    // Negative limit check
-    if (wallet.balance <= -500) {
-        alert("⚠ Wallet limit -₹500 reached.\nRecharge Required!");
-        disableAllRides();
-    }
-
-    // Mark ride completed
-    rideRequest.status = "completed";
-    localStorage.setItem(requestKey, JSON.stringify(rideRequest));
-
-    alert("Ride Completed ✅\nCommission ₹" + commission + " deducted");
-
-    // Remove route
-    if (routingControl) {
-        map.removeControl(routingControl);
-        routingControl = null;
-    }
-
-    if (userMarker) {
-        map.removeLayer(userMarker);
-        userMarker = null;
-    }
-}
-function disableAllRides() {
-
-    const buttons = document.querySelectorAll(".ride-card button");
-
-    buttons.forEach(btn => {
-        btn.disabled = true;
-        btn.innerText = "Recharge Required";
-        btn.style.backgroundColor = "gray";
-    });
-}
-// ================= LIVE RIDE REQUEST LISTENER =================
-setInterval(function () {
-
-    const requestKey = "rideRequest_" + riderId;
-    const rideRequest = JSON.parse(localStorage.getItem(requestKey));
-
-  let wallet = JSON.parse(localStorage.getItem(walletKey));
-
-if (
-    rideRequest &&
-    rideRequest.status === "pending" &&
-    wallet &&
-    wallet.balance > -500
-) {
-
-        document.getElementById("rideInfo").innerHTML = `
-            <h2>New Ride Request 🚖</h2>
-            <p><strong>Pickup:</strong> ${rideRequest.pickup}</p>
-            <p><strong>Drop:</strong> ${rideRequest.drop}</p>
-            <p><strong>Fare:</strong> ₹${rideRequest.fare}</p>
-        `;
-
-        // ACCEPT BUTTON
-        document.getElementById("acceptBtn").onclick = function () {
-
-            rideRequest.status = "accepted";
-            localStorage.setItem(requestKey, JSON.stringify(rideRequest));
-
-            localStorage.setItem("rideStatus_user", JSON.stringify({
-                status: "accepted",
-                rider: riderId
-            }));
-
-            alert("Ride Accepted 🚖");
-        };
-
-        // REJECT BUTTON
-        document.getElementById("rejectBtn").onclick = function () {
-
-            localStorage.removeItem(requestKey);
-            alert("Ride Rejected ❌");
-        };
-    }
-
-}, 2000);
+                const currentlyOnline =
+                    statusText.textContent.trim()
+                    ===
+                    "Online";
 
 
-// ================= SUPABASE REALTIME =================
-supabaseClient
-.channel('new-rides')
-.on(
-    'postgres_changes',
-    {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'rides'
-    },
-    (payload) => {
+                if (
+                    currentlyOnline
+                ) {
 
-        const ride = payload.new;
+                    goOffline();
 
-        if (ride.status === "pending") {
-            alert("New Ride Request 🚖");
+                } else {
+
+                    goOnline();
+                }
+            }
+        );
+
+
+        // ==================================================
+        // GO ONLINE
+        // ==================================================
+
+        function goOnline() {
+
+            if (
+                !navigator.geolocation
+            ) {
+
+                alert(
+                    "Your browser does not support GPS location."
+                );
+
+                return;
+            }
+
+
+            statusText.textContent =
+                "Getting location...";
+
+
+            navigator.geolocation.getCurrentPosition(
+
+                function (position) {
+
+                    statusText.textContent =
+                        "Online";
+
+
+                    statusText.style.color =
+                        "green";
+
+
+                    toggleStatusBtn.textContent =
+                        "Go Offline";
+
+
+                    updateRiderLocation(
+                        position
+                    );
+
+
+                    watchId =
+                        navigator.geolocation.watchPosition(
+
+                            function (newPosition) {
+
+                                updateRiderLocation(
+                                    newPosition
+                                );
+                            },
+
+                            function (error) {
+
+                                console.error(
+                                    "GPS error:",
+                                    error
+                                );
+                            },
+
+                            {
+
+                                enableHighAccuracy:
+                                    true,
+
+                                maximumAge:
+                                    2000,
+
+                                timeout:
+                                    10000
+
+                            }
+                        );
+                },
+
+
+                function (error) {
+
+                    console.error(
+                        error
+                    );
+
+
+                    statusText.textContent =
+                        "Offline";
+
+
+                    alert(
+                        "Location permission is required to go online."
+                    );
+                },
+
+
+                {
+
+                    enableHighAccuracy:
+                        true,
+
+                    timeout:
+                        15000,
+
+                    maximumAge:
+                        0
+
+                }
+            );
+        }
+
+
+        // ==================================================
+        // UPDATE RIDER LOCATION
+        // ==================================================
+
+        function updateRiderLocation(
+            position
+        ) {
+
+            const lat =
+                position.coords.latitude;
+
+
+            const lng =
+                position.coords.longitude;
+
+
+            if (!riderMarker) {
+
+                riderMarker =
+                    L.marker(
+                        [lat, lng]
+                    )
+                    .addTo(map)
+                    .bindPopup(
+                        "🚗 You are here"
+                    );
+
+            } else {
+
+                riderMarker.setLatLng(
+                    [lat, lng]
+                );
+            }
+
+
+            map.setView(
+                [lat, lng],
+                15
+            );
+
+
+            const riderData = {
+
+                phone:
+                    riderPhone,
+
+                name:
+                    riderName,
+
+                vehicle:
+                    riderVehicle,
+
+                plate:
+                    riderPlate,
+
+                lat:
+                    lat,
+
+                lng:
+                    lng,
+
+                online:
+                    true,
+
+                updatedAt:
+                    Date.now()
+            };
+
+
+            saveStorageObject(
+                activeRiderKey,
+                riderData
+            );
+        }
+
+
+        // ==================================================
+        // GO OFFLINE
+        // ==================================================
+
+        function goOffline() {
+
+            if (
+                watchId !== null
+            ) {
+
+                navigator.geolocation.clearWatch(
+                    watchId
+                );
+
+                watchId =
+                    null;
+            }
+
+
+            localStorage.removeItem(
+                activeRiderKey
+            );
+
+
+            statusText.textContent =
+                "Offline";
+
+
+            statusText.style.color =
+                "red";
+
+
+            toggleStatusBtn.textContent =
+                "Go Online";
+
+
+            if (riderMarker) {
+
+                map.removeLayer(
+                    riderMarker
+                );
+
+                riderMarker =
+                    null;
+            }
+        }
+
+
+        // ==================================================
+        // CHECK REQUEST
+        // ==================================================
+
+        function checkRideRequest() {
+
+            const request =
+                getStorageObject(
+                    requestKey
+                );
+
+
+            if (!request) {
+
+                if (
+                    !currentRide ||
+                    currentRide.status !==
+                    "accepted"
+                ) {
+
+                    showNoRequest();
+                }
+
+                return;
+            }
+
+
+            if (
+                request.status ===
+                "pending"
+            ) {
+
+                currentRide =
+                    request;
+
+
+                showRideRequest(
+                    request
+                );
+
+                return;
+            }
+
+
+            if (
+                request.status ===
+                "accepted"
+            ) {
+
+                currentRide =
+                    request;
+
+
+                showActiveRide(
+                    request
+                );
+
+                return;
+            }
+
+
+            if (
+                request.status ===
+                "completed"
+            ) {
+
+                showNoRequest();
+
+                return;
+            }
+
+
+            if (
+                request.status ===
+                "rejected"
+            ) {
+
+                showNoRequest();
+            }
+        }
+
+
+        // ==================================================
+        // SHOW NO REQUEST
+        // ==================================================
+
+        function showNoRequest() {
+
+            rideRequestCard.style.display =
+                "none";
+
+
+            noRideMessage.style.display =
+                "block";
+        }
+
+
+        // ==================================================
+        // SHOW REQUEST
+        // ==================================================
+
+        function showRideRequest(
+            request
+        ) {
+
+            if (
+                !walletAllowed()
+            ) {
+
+                return;
+            }
+
+
+            noRideMessage.style.display =
+                "none";
+
+
+            rideRequestCard.style.display =
+                "block";
+
+
+            activeRideCard.style.display =
+                "none";
+
+
+            document.getElementById(
+                "requestUserName"
+            ).textContent =
+                request.userName ||
+                "User";
+
+
+            document.getElementById(
+                "requestUserPhone"
+            ).textContent =
+                request.userPhone ||
+                "";
+
+
+            document.getElementById(
+                "requestPickup"
+            ).textContent =
+                request.pickup ||
+                "";
+
+
+            document.getElementById(
+                "requestDrop"
+            ).textContent =
+                request.drop ||
+                "";
+
+
+            document.getElementById(
+                "requestVehicle"
+            ).textContent =
+                request.vehicle ||
+                "";
+
+
+            document.getElementById(
+                "requestFare"
+            ).textContent =
+                request.fare ||
+                0;
+
+
+            document.getElementById(
+                "requestDistance"
+            ).textContent =
+                request.distance ||
+                0;
+
+
+            showRequestOnMap(
+                request
+            );
+        }
+
+
+        // ==================================================
+        // SHOW REQUEST ON MAP
+        // ==================================================
+
+        function showRequestOnMap(
+            request
+        ) {
+
+            if (
+                typeof request.pickupLat !==
+                "number"
+            ) {
+
+                return;
+            }
+
+
+            if (
+                pickupMarker
+            ) {
+
+                map.removeLayer(
+                    pickupMarker
+                );
+            }
+
+
+            if (
+                dropMarker
+            ) {
+
+                map.removeLayer(
+                    dropMarker
+                );
+            }
+
+
+            pickupMarker =
+                L.marker(
+                    [
+                        request.pickupLat,
+                        request.pickupLng
+                    ]
+                )
+                .addTo(map)
+                .bindPopup(
+                    "📍 Passenger Pickup"
+                );
+
+
+            if (
+                typeof request.dropLat ===
+                "number"
+            ) {
+
+                dropMarker =
+                    L.marker(
+                        [
+                            request.dropLat,
+                            request.dropLng
+                        ]
+                    )
+                    .addTo(map)
+                    .bindPopup(
+                        "🏁 Destination"
+                    );
+            }
+
+
+            map.setView(
+                [
+                    request.pickupLat,
+                    request.pickupLng
+                ],
+                14
+            );
+        }
+
+
+        // ==================================================
+        // ACCEPT RIDE
+        // ==================================================
+
+        acceptBtn.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    !walletAllowed()
+                ) {
+
+                    return;
+                }
+
+
+                const request =
+                    getStorageObject(
+                        requestKey
+                    );
+
+
+                if (
+                    !request ||
+                    request.status !==
+                    "pending"
+                ) {
+
+                    alert(
+                        "This ride request is no longer available."
+                    );
+
+                    return;
+                }
+
+
+                request.status =
+                    "accepted";
+
+
+                request.riderPhone =
+                    riderPhone;
+
+
+                request.riderName =
+                    riderName;
+
+
+                request.riderVehicle =
+                    riderVehicle;
+
+
+                request.riderPlate =
+                    riderPlate;
+
+
+                saveStorageObject(
+                    requestKey,
+                    request
+                );
+
+
+                saveStorageObject(
+                    "activeUserRide",
+                    request
+                );
+
+
+                currentRide =
+                    request;
+
+
+                showActiveRide(
+                    request
+                );
+
+
+                alert(
+                    "Ride Accepted 🚕"
+                );
+            }
+        );
+
+
+        // ==================================================
+        // REJECT RIDE
+        // ==================================================
+
+        rejectBtn.addEventListener(
+            "click",
+            function () {
+
+                const request =
+                    getStorageObject(
+                        requestKey
+                    );
+
+
+                if (
+                    !request
+                ) {
+
+                    return;
+                }
+
+
+                request.status =
+                    "rejected";
+
+
+                saveStorageObject(
+                    requestKey,
+                    request
+                );
+
+
+                /*
+                 * Also update the user's
+                 * active ride.
+                 */
+
+                saveStorageObject(
+                    "activeUserRide",
+                    request
+                );
+
+
+                currentRide =
+                    null;
+
+
+                rideRequestCard.style.display =
+                    "none";
+
+
+                noRideMessage.style.display =
+                    "block";
+
+
+                alert(
+                    "Ride Rejected ❌"
+                );
+            }
+        );
+
+
+        // ==================================================
+        // SHOW ACTIVE RIDE
+        // ==================================================
+
+        function showActiveRide(
+            request
+        ) {
+
+            rideRequestCard.style.display =
+                "none";
+
+
+            noRideMessage.style.display =
+                "none";
+
+
+            activeRideCard.style.display =
+                "block";
+
+
+            document.getElementById(
+                "activeUserName"
+            ).textContent =
+                request.userName ||
+                "User";
+
+
+            document.getElementById(
+                "activeUserPhone"
+            ).textContent =
+                request.userPhone ||
+                "";
+
+
+            document.getElementById(
+                "activePickup"
+            ).textContent =
+                request.pickup ||
+                "";
+
+
+            document.getElementById(
+                "activeDrop"
+            ).textContent =
+                request.drop ||
+                "";
+
+
+            document.getElementById(
+                "activeFare"
+            ).textContent =
+                request.fare ||
+                0;
+
+
+            document.getElementById(
+                "activeRideStatus"
+            ).textContent =
+                "Accepted ✅";
+
+
+            showRequestOnMap(
+                request
+            );
+
+
+            drawActiveRoute(
+                request
+            );
+        }
+
+
+        // ==================================================
+        // ACTIVE ROUTE
+        // ==================================================
+
+        function drawActiveRoute(
+            request
+        ) {
+
+            if (
+                !request.pickupLat ||
+                !request.dropLat
+            ) {
+
+                return;
+            }
+
+
+            if (
+                routingControl
+            ) {
+
+                map.removeControl(
+                    routingControl
+                );
+
+                routingControl =
+                    null;
+            }
+
+
+            const riderPosition =
+                riderMarker
+                    ? riderMarker.getLatLng()
+                    : L.latLng(
+                        request.pickupLat,
+                        request.pickupLng
+                    );
+
+
+            routingControl =
+                L.Routing.control({
+
+                    waypoints: [
+
+                        riderPosition,
+
+                        L.latLng(
+                            request.pickupLat,
+                            request.pickupLng
+                        ),
+
+                        L.latLng(
+                            request.dropLat,
+                            request.dropLng
+                        )
+
+                    ],
+
+                    routeWhileDragging:
+                        false,
+
+                    addWaypoints:
+                        false,
+
+                    draggableWaypoints:
+                        false,
+
+                    createMarker:
+                        function () {
+
+                            return null;
+                        }
+
+                }).addTo(map);
+        }
+
+
+        // ==================================================
+        // COMPLETE RIDE
+        // ==================================================
+
+        completeRideBtn.addEventListener(
+            "click",
+            function () {
+
+                const request =
+                    getStorageObject(
+                        requestKey
+                    );
+
+
+                if (
+                    !request ||
+                    request.status !==
+                    "accepted"
+                ) {
+
+                    alert(
+                        "No active ride found."
+                    );
+
+                    return;
+                }
+
+
+                const fare =
+                    Number(
+                        request.fare
+                    ) || 0;
+
+
+                const commission =
+                    fare * 0.25;
+
+
+                wallet =
+                    getStorageObject(
+                        walletKey
+                    ) || {
+                        balance: 0
+                    };
+
+
+                /*
+                 * Cash/normal demo:
+                 * rider pays 25% commission.
+                 */
+
+                if (
+                    wallet.balance -
+                    commission <
+                    -500
+                ) {
+
+                    alert(
+                        "⚠ Wallet limit -₹500 reached."
+                    );
+
+                    return;
+                }
+
+
+                wallet.balance -=
+                    commission;
+
+
+                company =
+                    getStorageObject(
+                        companyKey
+                    ) || {
+                        balance: 0
+                    };
+
+
+                company.balance +=
+                    commission;
+
+
+                saveStorageObject(
+                    walletKey,
+                    wallet
+                );
+
+
+                saveStorageObject(
+                    companyKey,
+                    company
+                );
+
+
+                request.status =
+                    "completed";
+
+
+                request.completedAt =
+                    new Date().toISOString();
+
+
+                saveStorageObject(
+                    requestKey,
+                    request
+                );
+
+
+                saveStorageObject(
+                    "activeUserRide",
+                    request
+                );
+
+
+                currentRide =
+                    null;
+
+
+                updateWalletDisplay();
+
+
+                if (
+                    routingControl
+                ) {
+
+                    map.removeControl(
+                        routingControl
+                    );
+
+                    routingControl =
+                        null;
+                }
+
+
+                if (
+                    pickupMarker
+                ) {
+
+                    map.removeLayer(
+                        pickupMarker
+                    );
+
+                    pickupMarker =
+                        null;
+                }
+
+
+                if (
+                    dropMarker
+                ) {
+
+                    map.removeLayer(
+                        dropMarker
+                    );
+
+                    dropMarker =
+                        null;
+                }
+
+
+                activeRideCard.style.display =
+                    "none";
+
+
+                noRideMessage.style.display =
+                    "block";
+
+
+                alert(
+                    "Ride Completed ✅\n" +
+                    "Commission: ₹" +
+                    commission.toFixed(2)
+                );
+            }
+        );
+
+
+        // ==================================================
+        // INITIAL RIDE CHECK
+        // ==================================================
+
+        checkRideRequest();
+
+
+        // ==================================================
+        // CHECK NEW REQUEST EVERY SECOND
+        // ==================================================
+
+        setInterval(
+            function () {
+
+                checkRideRequest();
+
+            },
+            1000
+        );
+
+
+        // ==================================================
+        // INITIAL RIDER STATUS
+        // ==================================================
+
+        const savedRider =
+            getStorageObject(
+                activeRiderKey
+            );
+
+
+        if (
+            savedRider &&
+            savedRider.online === true
+        ) {
+
+            /*
+             * Do not automatically start GPS.
+             * Browser permission should be
+             * triggered by button click.
+             */
+
+            statusText.textContent =
+                "Offline";
+
+            toggleStatusBtn.textContent =
+                "Go Online";
         }
 
     }
-)
-.subscribe();
+);
