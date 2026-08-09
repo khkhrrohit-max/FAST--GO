@@ -1,35 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Fast Go - Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="project2.css">
+    <title>FAST GO - Book Your Ride</title>
 
-    
+    <!-- YOUR CSS -->
+    <link rel="stylesheet" href="project2.css">
 
     <!-- FontAwesome -->
     <link rel="stylesheet"
-     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet"
-     href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"/>
+        href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+
+    
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<header class="navbar">
-    <div class="logo">
-        <img src="fast go.png" alt="Fast Go Logo">
-        <h2>FAST GO</h2>
-    </div>
+    <!-- ================= NAVBAR ================= -->
 
     <nav>
         <a href="about.html">About</a>
@@ -39,109 +37,233 @@
         <a href="index2.html">LOGOUT</a>
         <a href="useryour.html">YOUR</a>
     </nav>
-</header>
 
-<!-- ================= HERO SECTION ================= -->
-<section class="hero">
-    <div class="hero-content">
-        <h1>Your Ride, Your Way!</h1>
-        <p>Book Auto, Taxi & Bike in Minutes</p>
+
+    <!-- ================= BOOKING SECTION ================= -->
+
+    <section class="booking-section">
 
         <div class="booking-box">
 
+            <h2>Book Your Ride</h2>
+
+            <!-- LIVE LOCATION -->
+
             <div class="row">
-                <button id="chooseLocationBtn">📍 Use Live Location</button>
 
-    <input type="text" id="pickup" placeholder="Enter Pickup">
-<div id="pickupSuggestions" class="suggestions"></div>
+                <button id="chooseLocationBtn" type="button">
+                    📍 Use Live Location
+                </button>
 
-<input type="text" id="drop" placeholder="Enter Drop">
-<div id="dropSuggestions" class="suggestions"></div>
+            </div>
+
+
+            <!-- PICKUP -->
+
+            <div class="location-input-box">
+
+                <input
+                    type="text"
+                    id="pickup"
+                    placeholder="Enter Pickup Location"
+                    autocomplete="off">
+
+                <div
+                    id="pickupSuggestions"
+                    class="suggestions">
+                </div>
+
+            </div>
+
+
+            <!-- DROP -->
+
+            <div class="location-input-box">
+
+                <input
+                    type="text"
+                    id="drop"
+                    placeholder="Enter Destination"
+                    autocomplete="off">
+
+                <div
+                    id="dropSuggestions"
+                    class="suggestions">
+                </div>
+
+            </div>
+
+
+            <!-- VEHICLE -->
 
             <select id="vehicle">
-                <option value="Bike">Bike</option>
-                <option value="Auto">Auto</option>
-                <option value="Taxi">Taxi</option>
+
+                <option value="Bike">
+                    Bike
+                </option>
+
+                <option value="Auto">
+                    Auto
+                </option>
+
+                <option value="Taxi">
+                    Taxi
+                </option>
+
             </select>
-            
 
-            <button id="searchRideBtn">Request Ride</button>
 
-            <div id="rideStatus" style="margin-top:10px;"></div>
-            <div id="rideDetails" style="margin-top:10px;"></div>
+            <!-- REQUEST -->
 
-            <div id="map" style="height:350px; margin-top:15px;"></div>
+            <button
+                id="searchRideBtn"
+                type="button">
 
-            <!-- Nearby Riders List -->
-            <div id="vehicleList" style="margin-top:20px;"></div>
+                Request Ride
+
+            </button>
+
+
+            <!-- STATUS -->
+
+            <div id="rideStatus"></div>
+
+            <div id="rideDetails"></div>
+
+
+            <!-- MAP -->
+
+            <div
+                id="map"
+                style="height:350px; margin-top:15px;">
+            </div>
+
+
+            <!-- NEARBY RIDERS -->
+
+            <div
+                id="vehicleList"
+                style="margin-top:20px;">
+            </div>
+
+
+            <!-- ================= ACCEPTED RIDER ================= -->
+
+            <div id="riderInfoCard">
+
+                <h3>
+                    🚕 Your Rider
+                </h3>
+
+                <div class="rider-info-row">
+                    <strong>Name:</strong>
+                    <span id="acceptedRiderName">
+                        -
+                    </span>
+                </div>
+
+                <div class="rider-info-row">
+                    <strong>Mobile:</strong>
+                    <span id="acceptedRiderPhone">
+                        -
+                    </span>
+                </div>
+
+                <div class="rider-info-row">
+                    <strong>Vehicle:</strong>
+                    <span id="acceptedRiderVehicle">
+                        -
+                    </span>
+                </div>
+
+                <div class="rider-info-row">
+                    <strong>Plate:</strong>
+                    <span id="acceptedRiderPlate">
+                        -
+                    </span>
+                </div>
+
+                <div class="rider-info-row">
+                    <strong>Status:</strong>
+                    <span id="acceptedRiderStatus">
+                        -
+                    </span>
+                </div>
+
+                <p>
+                    🟢 Rider location is being updated on the map.
+                </p>
+
+            </div>
 
         </div>
-         
-    </div>
-  
-</section>
+
+    </section>
 
 
-<!-- ================= ABOUT SECTION ================= -->
-<section class="about" id="about">
-    <h2>About Fast Go</h2>
-    <p>
-        Fast Go is a smart ride booking platform that allows you to book
-        Auto, Taxi, and Bike services instantly. We provide safe,
-        affordable, and quick transportation at your fingertips.
-    </p>
-</section>
+    <!-- ================= SERVICES ================= -->
 
-<!-- ================= SERVICES SECTION ================= -->
-<section class="services" id="services">
-    <h2>Our Services</h2>
+    <section id="services">
 
-    <div class="service-box">
-        <i class="fa-solid fa-motorcycle"></i>
-        <h3>Bike</h3>
-        <p>Quick and affordable ride for single passengers.</p>
-    </div>
+        <div class="service-box">
 
-    <div class="service-box">
-        <i class="fa-solid fa-taxi"></i>
-        <h3>Taxi</h3>
-        <p>Comfortable rides for family and group travel.</p>
-    </div>
+            <i class="fa-solid fa-motorcycle"></i>
 
-    <div class="service-box">
-        <i class="fa-solid fa-car"></i>
-        <h3>Auto</h3>
-        <p>Easy and budget-friendly city transport.</p>
-    </div>
-</section>
+            <h3>
+                Bike
+            </h3>
 
-<!-- ================= CONTACT SECTION ================= -->
-<section class="contact" id="contact">
-    <h2>Contact Us</h2>
-    <p>designed by ROHIT KHOKHAR</p>
-    <p>Email: khkhrrohit@gmail.com</p>
-    <p>Phone: +91 8099317347</p>
-    <p>Location: India</p>
-</section>
+            <p>
+                Quick and affordable ride for single passengers.
+            </p>
 
-<!-- ================= FOOTER ================= -->
-<footer>
-    <p>© 2026 Fast Go | Designed by Rohit</p>
-</footer>
+        </div>
 
-<!-- ================= SCRIPTS ================= -->
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <div class="service-box">
 
-<!-- Leaflet Routing Machine -->
-<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+            <i class="fa-solid fa-taxi"></i>
 
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            <h3>
+                Taxi
+            </h3>
 
-<!-- Your JS -->
-<script src="project2.js"></script>
+            <p>
+                Comfortable rides for family and group travel.
+            </p>
+
+        </div>
+
+
+        <div class="service-box">
+
+            <i class="fa-solid fa-car"></i>
+
+            <h3>
+                Auto
+            </h3>
+
+            <p>
+                Easy and budget-friendly city transport.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+    <script
+        src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js">
+    </script>
+
+    <script src="project2.js"></script>
 
 </body>
+
 </html>
