@@ -1,296 +1,1071 @@
+
+/* =========================================================
+   FAST GO - PROJECT 2 CSS
+   Responsive: Mobile + Tablet + Laptop + Desktop
+   ========================================================= */
+
+/* =========================
+   GLOBAL
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #222;
     overflow-x: hidden;
 }
 
-/* Navbar */
-.navbar {
+/* =========================
+   NAVBAR
+========================= */
+
+nav {
+    width: 100%;
+    min-height: 70px;
+    padding: 15px 5%;
+    background: #000;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    padding: 15px 50px;
-    background: black;
-    color: white;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 10000;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
 }
 
-.navbar a {
+nav a {
     color: white;
     text-decoration: none;
-    margin-left: 20px;
-    transition: 0.3s;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 10px 15px;
+    border-radius: 7px;
+    transition: 0.3s ease;
+    white-space: nowrap;
 }
 
-.navbar a:hover {
-    color: gold;
+nav a:hover {
+    background: gold;
+    color: #000;
+    transform: translateY(-2px);
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-}
+/* =========================
+   BOOKING SECTION
+========================= */
 
-.logo img {
-    width: 40px;
-    margin-right: 10px;
-}
+.booking-section {
+    min-height: calc(100vh - 70px);
+    padding: 50px 20px 70px;
 
-/* Hero */
-.hero {
-    min-height: 90vh;
-    padding-bottom: 60px; /* extra space */
+    background:
+        linear-gradient(
+            rgba(0, 0, 0, 0.55),
+            rgba(0, 0, 0, 0.65)
+        ),
+        url("ride.jpg") center center / cover no-repeat;
 
-    background: url("ride.jpg") no-repeat center center/cover;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+}
+
+/* =========================
+   BOOKING BOX
+========================= */
+
+.booking-box {
+    width: 100%;
+    max-width: 1050px;
+
+    padding: 35px;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.35);
+
+    backdrop-filter: blur(10px);
+}
+
+.booking-box > h2 {
     text-align: center;
-    color: white;
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: #111;
+    font-weight: 700;
 }
 
-.hero-content {
-    background: rgba(0,0,0,0.6);
-    padding: 40px;
-    border-radius: 10px;
-}
-
-.booking-box input,
-.booking-box select {
-    padding: 10px;
-    margin: 5px;
-    border-radius: 5px;
-    border: none;
-}
+/* =========================
+   ROW
+========================= */
 
 .row {
-    position: relative;   /* 🔥 REQUIRED */
-}
-
-.suggestions {
-    position: absolute;
-    background: rgb(74, 131, 86);
-    border: 1px solid #7b6077;
     width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 9999;
+    margin-bottom: 18px;
+    position: relative;
 }
 
-.suggestions div {
-    padding: 10px;
-    cursor: pointer;
-}
+/* =========================
+   LIVE LOCATION BUTTON
+========================= */
 
-.suggestions div:hover {
-    background: #72871e;
-}
-.booking-box button {
-    padding: 10px 20px;
-    background: gold;
+#chooseLocationBtn {
+    width: 100%;
+    padding: 14px 20px;
+
     border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
-}
-
-.booking-box button:hover {
-    background: orange;
-}
-
-/* About Section */
-.about {
-    padding: 60px;
-    text-align: center;
-    background: #f4f4f4;
-}
-
-/* Services */
-.services {
-    padding: 60px;
-    text-align: center;
-}
-
-.service-box {
-    display: inline-block;
-    width: 250px;
-    margin: 20px;
-    padding: 20px;
     border-radius: 10px;
-    background: #1e90ff;
-    color: white;
-    transition: 0.3s;
-}
 
-.service-box i {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-.service-box:hover {
-    transform: scale(1.05);
-    background: #00bfff;
-}
-
-/* Contact */
-.contact {
-    padding: 60px;
-    text-align: center;
-    background: #f4f4f4;
-}
-
-/* Footer */
-footer {
-    background: black;
-    color: white;
-    text-align: center;
-    padding: 15px;
-}
-.pickup-wrapper {
-    display: flex;
-    gap: 5px;
-}
-
-.pickup-wrapper input {
-    flex: 1;
-}
-
-.pickup-wrapper button {
-    width: 50px;
     background: #28a745;
     color: white;
-    border: none;
+
+    font-size: 16px;
+    font-weight: bold;
+
     cursor: pointer;
-}
-/* ================= VEHICLE LIST SECTION ================= */
 
-#vehicleList {
-    margin: 40px auto;
-    width: 90%;
-    max-width: 1000px;
-}
-
-/* Each Rider Box */
-.rider-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: white;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     transition: 0.3s ease;
 }
 
-.rider-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+#chooseLocationBtn:hover {
+    background: #218838;
+    transform: translateY(-2px);
 }
 
-/* Car Image */
-.rider-box img {
-    width: 90px;
-    height: 70px;
-    object-fit: cover;
-    border-radius: 8px;
+#chooseLocationBtn:disabled {
+    background: #777;
+    cursor: wait;
 }
 
-/* Rider Details */
-.rider-details {
-    flex: 1;
-    margin-left: 20px;
+/* =========================
+   LOCATION INPUT
+========================= */
+
+.location-input-box {
+    width: 100%;
+    position: relative;
+    margin-bottom: 15px;
 }
 
-.rider-details h3 {
-    margin: 0;
-    color: #1e90ff;
+.location-input-box input {
+    width: 100%;
+    padding: 15px 18px;
+
+    border: 2px solid #ddd;
+    border-radius: 10px;
+
+    outline: none;
+
+    font-size: 16px;
+
+    background: white;
+
+    transition: 0.3s ease;
 }
 
-.rider-details p {
-    margin: 5px 0;
-    color: #555;
+.location-input-box input:focus {
+    border-color: #1e90ff;
+
+    box-shadow:
+        0 0 0 3px rgba(30, 144, 255, 0.12);
+}
+
+.location-input-box input::placeholder {
+    color: #888;
+}
+
+/* =========================
+   LOCATION SUGGESTIONS
+========================= */
+
+.suggestions {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    top: calc(100% + 3px);
+
+    background: white;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+
+    max-height: 250px;
+
+    overflow-y: auto;
+
+    z-index: 99999;
+
+    box-shadow:
+        0 8px 25px rgba(85, 28, 28, 0.2);
+
+    display: block;
+}
+
+/* Hide empty suggestion boxes */
+
+.suggestions:empty {
+    display: none;
+}
+
+/* Individual suggestion */
+
+.suggestions div {
+    padding: 13px 15px;
+
+    color: #222;
+
     font-size: 14px;
+
+    line-height: 1.4;
+
+    cursor: pointer;
+
+    border-bottom: 1px solid #eee;
+
+    transition: 0.2s ease;
 }
 
-/* Price */
+.suggestions div:last-child {
+    border-bottom: none;
+}
+
+.suggestions div:hover {
+    background: #eaf4ff;
+    color: #0066cc;
+}
+
+/* Search loading */
+
+.suggestion-loading {
+    color: #555 !important;
+    cursor: default !important;
+    background: #fafafa;
+}
+
+/* =========================
+   VEHICLE SELECT
+========================= */
+
+#vehicle {
+    width: 100%;
+
+    padding: 14px 16px;
+
+    margin-bottom: 15px;
+
+    border: 2px solid #ddd;
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: #222;
+
+    font-size: 16px;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+#vehicle:focus {
+    border-color: #1e90ff;
+
+    box-shadow:
+        0 0 0 3px rgba(30, 144, 255, 0.12);
+}
+
+/* =========================
+   REQUEST RIDE BUTTON
+========================= */
+
+#searchRideBtn {
+    width: 100%;
+
+    padding: 15px 20px;
+
+    background: gold;
+
+    color: #111;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+
+    box-shadow:
+        0 5px 15px rgba(255, 193, 7, 0.3);
+}
+
+#searchRideBtn:hover {
+    background: #ffb300;
+
+    transform: translateY(-2px);
+}
+
+#searchRideBtn:disabled {
+    background: #aaa;
+
+    color: white;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+/* =========================
+   RIDE STATUS
+========================= */
+
+#rideStatus {
+    margin-top: 20px;
+}
+
+/* =========================
+   RIDE DETAILS
+========================= */
+
+#rideDetails {
+    margin-top: 15px;
+}
+
+/* Common information card */
+
+.ride-card-user {
+    width: 100%;
+
+    padding: 18px;
+
+    margin-top: 12px;
+
+    background: #f8fbff;
+
+    border: 1px solid #d8e8f8;
+
+    border-left: 5px solid #1e90ff;
+
+    border-radius: 10px;
+
+    color: #222;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ride-card-user h2,
+.ride-card-user h3 {
+    margin-bottom: 10px;
+    color: #111;
+}
+
+.ride-card-user p {
+    margin: 7px 0;
+    line-height: 1.5;
+}
+
+/* =========================
+   MAP
+========================= */
+
+#map {
+    width: 100%;
+
+    height: 420px !important;
+
+    margin-top: 20px !important;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    border: 2px solid #ddd;
+
+    box-shadow:
+        0 7px 25px rgba(0, 0, 0, 0.18);
+
+    z-index: 1;
+}
+
+/* Leaflet popup */
+
+.leaflet-popup-content {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* =========================
+   VEHICLE / RIDER LIST
+========================= */
+/* =========================================================
+   NEARBY RIDERS
+========================================================= */
+
+#vehicleList {
+    width: 100%;
+    margin-top: 25px !important;
+    padding: 20px;
+
+    background: #f1f5f9 !important;
+
+    border-radius: 15px;
+    border: 1px solid #dbe3ec;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   RIDER CARD
+========================================================= */
+
+#vehicleList .ride-card-user,
+#vehicleList .rider-box {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 18px;
+
+    margin-bottom: 15px;
+
+    background: #ffffff !important;
+
+    color: #222222 !important;
+
+    border: 1px solid #dce6f0;
+
+    border-left: 5px solid #1e90ff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.10);
+
+    transition: 0.3s ease;
+}
+
+
+#vehicleList .ride-card-user:last-child,
+#vehicleList .rider-box:last-child {
+    margin-bottom: 0;
+}
+
+
+#vehicleList .ride-card-user:hover,
+#vehicleList .rider-box:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================================
+   RIDER NAME
+========================================================= */
+
+#vehicleList .ride-card-user h2,
+#vehicleList .ride-card-user h3,
+#vehicleList .rider-box h2,
+#vehicleList .rider-box h3 {
+
+    margin-top: 0;
+
+    margin-bottom: 10px;
+
+    color: #1e90ff !important;
+
+    font-size: 20px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   RIDER DETAILS
+========================================================= */
+
+#vehicleList .ride-card-user p,
+#vehicleList .rider-box p {
+
+    margin: 7px 0;
+
+    color: #333333 !important;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+}
+
+
+/* Important values */
+
+#vehicleList .ride-card-user strong,
+#vehicleList .rider-box strong {
+
+    color: #111111 !important;
+}
+
+
+/* =========================================================
+   ONLINE STATUS
+========================================================= */
+
+#vehicleList .online-status {
+
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    background: #e8f8ed;
+
+    color: #16803c !important;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    #vehicleList {
+        padding: 12px;
+    }
+
+    #vehicleList .ride-card-user,
+    #vehicleList .rider-box {
+
+        padding: 15px;
+
+        border-left-width: 4px;
+    }
+
+    #vehicleList .ride-card-user h3,
+    #vehicleList .rider-box h3 {
+
+        font-size: 18px;
+    }
+
+    #vehicleList .ride-card-user p,
+    #vehicleList .rider-box p {
+
+        font-size: 14px;
+    }
+}
+
+/* Rider price */
+
 .rider-price {
     font-size: 18px;
+
     font-weight: bold;
+
     color: #28a745;
+
+    white-space: nowrap;
 }
 
-/* Select Button */
+/* Select button */
+
 .select-btn {
-    padding: 10px 18px;
+    padding: 10px 16px;
+
     background: gold;
+
+    color: #111;
+
     border: none;
-    border-radius: 6px;
+
+    border-radius: 7px;
+
+    font-weight: bold;
+
     cursor: pointer;
-    transition: 0.3s;
+
+    transition: 0.3s ease;
+
+    white-space: nowrap;
 }
 
 .select-btn:hover {
     background: orange;
-}
-/* ================= FIX RIDER LIST VISIBILITY ================= */
 
-#vehicleList {
-    margin-top: 30px;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.7);   /* Dark background */
-    border-radius: 12px;
+    transform: translateY(-2px);
 }
 
-/* Rider Card */
-.rider-box {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.95);  /* Light card */
+/* =========================
+   NO RIDER MESSAGE
+========================= */
+
+#vehicleList > p {
+    color: white;
+
+    text-align: center;
+
+    font-weight: bold;
+
     padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 10px;
+
+    margin: 0;
+}
+
+/* =========================
+   ACCEPTED RIDER CARD
+========================= */
+
+#riderInfoCard {
+    display: none;
+
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 25px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #eef8ff
+        );
+
+    border-radius: 15px;
+
+    border: 2px solid #1e90ff;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+#riderInfoCard h3 {
+    margin-bottom: 18px;
+
+    font-size: 24px;
+
+    color: #1e90ff;
+}
+
+.rider-info-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.rider-info-row strong {
+    color: #333;
+}
+
+.rider-info-row span {
+    color: #111;
+
+    font-weight: 600;
+
+    text-align: right;
+
+    word-break: break-word;
+}
+
+#riderInfoCard > p {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    background: #e8f8ed;
+
+    color: #16702f;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-weight: 600;
+}
+
+/* =========================
+   SERVICES
+========================= */
+
+#services {
+    width: 100%;
+
+    padding: 70px 5%;
+
+    background: #f4f4f4;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: stretch;
+
+    gap: 25px;
+
+    flex-wrap: wrap;
+
+    text-align: center;
+}
+
+.service-box {
+    width: 280px;
+
+    min-height: 210px;
+
+    padding: 30px 25px;
+
+    border-radius: 15px;
+
+    background: #1e90ff;
+
+    color: white;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.15);
+
     transition: 0.3s ease;
 }
 
-/* Text visibility fix */
-.rider-box h3 {
-    margin: 0;
-    color: #111;   /* Dark text */
+.service-box:hover {
+    transform: translateY(-8px);
+
+    background: #00bfff;
+
+    box-shadow:
+        0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
-.rider-box p {
-    margin: 4px 0;
-    color: #333;   /* Dark grey */
-    font-size: 14px;
-}
+.service-box i {
+    font-size: 45px;
 
-/* Rider image fix */
-.rider-box img {
-    width: 80px;
-    height: 80px;
-    border-radius: 10px;
-    object-fit: cover;
-}
-
-/* If no rider found */
-#vehicleList p {
-    color: white;
-    font-weight: bold;
-}
-.rider-box {
-    display: flex;
-    gap: 15px;
-    padding: 15px;
     margin-bottom: 15px;
-    border-radius: 12px;
-
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    color: white;
 }
 
-.rider-box p,
-.rider-box h3 {
-    color: white;
+.service-box h3 {
+    font-size: 22px;
+
+    margin-bottom: 10px;
 }
+
+.service-box p {
+    font-size: 15px;
+
+    line-height: 1.6;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    width: 100%;
+
+    padding: 25px;
+
+    background: #000;
+
+    color: white;
+
+    text-align: center;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+
+    nav {
+        justify-content: center;
+
+        flex-wrap: wrap;
+
+        padding: 12px 20px;
+    }
+
+    nav a {
+        font-size: 14px;
+
+        padding: 8px 10px;
+
+        margin: 0;
+    }
+
+    .booking-section {
+        padding: 30px 15px 50px;
+    }
+
+    .booking-box {
+        padding: 25px;
+    }
+
+    #map {
+        height: 380px !important;
+    }
+
+    #services {
+        padding: 50px 20px;
+    }
+
+    .service-box {
+        width: 250px;
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    nav {
+        min-height: auto;
+
+        padding: 10px;
+
+        gap: 3px;
+    }
+
+    nav a {
+        font-size: 12px;
+
+        padding: 7px 8px;
+    }
+
+    .booking-section {
+        padding: 20px 10px 40px;
+    }
+
+    .booking-box {
+        padding: 18px 14px;
+
+        border-radius: 14px;
+    }
+
+    .booking-box > h2 {
+        font-size: 25px;
+
+        margin-bottom: 20px;
+    }
+
+    #chooseLocationBtn,
+    #searchRideBtn,
+    #vehicle {
+        font-size: 14px;
+    }
+
+    .location-input-box input {
+        font-size: 14px;
+
+        padding: 13px;
+    }
+
+    .suggestions {
+        max-height: 200px;
+    }
+
+    .suggestions div {
+        font-size: 13px;
+
+        padding: 11px;
+    }
+
+    #map {
+        height: 300px !important;
+
+        border-radius: 10px;
+    }
+
+    #vehicleList {
+        padding: 12px;
+    }
+
+    #vehicleList .rider-box {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        text-align: center;
+
+        gap: 10px;
+    }
+
+    #vehicleList .rider-box img {
+        margin: auto;
+    }
+
+    .rider-details {
+        width: 100%;
+    }
+
+    .rider-price {
+        text-align: center;
+    }
+
+    .select-btn {
+        width: 100%;
+    }
+
+    #riderInfoCard {
+        padding: 18px;
+    }
+
+    #riderInfoCard h3 {
+        font-size: 21px;
+    }
+
+    .rider-info-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .rider-info-row span {
+        text-align: left;
+    }
+
+    #services {
+        padding: 40px 15px;
+
+        gap: 15px;
+    }
+
+    .service-box {
+        width: 100%;
+
+        max-width: 350px;
+
+        min-height: 190px;
+    }
+}
+
+/* =========================
+   VERY SMALL PHONE
+========================= */
+
+@media (max-width: 380px) {
+
+    nav a {
+        font-size: 11px;
+
+        padding: 6px 5px;
+    }
+
+    .booking-box {
+        padding: 14px 10px;
+    }
+
+    .booking-box > h2 {
+        font-size: 22px;
+    }
+
+    #map {
+        height: 270px !important;
+    }
+
+    .service-box {
+        padding: 25px 15px;
+    }
+}
+
+/* =========================
+   LARGE DESKTOP / MAC
+========================= */
+
+@media (min-width: 1400px) {
+
+    .booking-box {
+        max-width: 1150px;
+
+        padding: 45px;
+    }
+
+    #map {
+        height: 500px !important;
+    }
+
+    .booking-box > h2 {
+        font-size: 36px;
+    }
+
+    nav {
+        padding-left: 7%;
+        padding-right: 7%;
+    }
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+.suggestions::-webkit-scrollbar {
+    width: 7px;
+}
+
+.suggestions::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.suggestions::-webkit-scrollbar-thumb {
+    background: #aaa;
+
+    border-radius: 10px;
+}
+
+.suggestions::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
