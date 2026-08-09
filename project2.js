@@ -1,465 +1,1696 @@
+// ======================================================
+// FAST GO - USER BOOKING SYSTEM
+// NO SUPABASE VERSION
+// ======================================================
+
 document.addEventListener("DOMContentLoaded", function () {
 
-    const pickupSelect = document.getElementById("pickup");
-    const dropSelect = document.getElementById("drop");
-    const chooseBtn = document.getElementById("chooseLocationBtn");
-    const searchBtn = document.getElementById("searchRideBtn");
-    const vehicleSelect = document.getElementById("vehicle");
-    const rideStatus = document.getElementById("rideStatus");
-    const rideDetails = document.getElementById("rideDetails");
-    const vehicleList = document.getElementById("vehicleList");
-    const pickupInput = document.getElementById("pickup");
-const dropInput = document.getElementById("drop");
+    // ==================================================
+    // ELEMENTS
+    // ==================================================
 
-const pickupBox = document.getElementById("pickupSuggestions");
-const dropBox = document.getElementById("dropSuggestions");
+    const pickupInput =
+        document.getElementById("pickup");
 
-pickupInput.addEventListener("input", () => {
-    searchPlaces(pickupInput.value, pickupBox, pickupInput);
-});
+    const dropInput =
+        document.getElementById("drop");
 
-dropInput.addEventListener("input", () => {
-    searchPlaces(dropInput.value, dropBox, dropInput);
-});
+    const pickupSuggestions =
+        document.getElementById("pickupSuggestions");
 
-    let map, routingControl;
-    let riderMarkers = {};
-    let nearestRider = null;
+    const dropSuggestions =
+        document.getElementById("dropSuggestions");
+
+    const chooseLocationBtn =
+        document.getElementById("chooseLocationBtn");
+
+    const searchRideBtn =
+        document.getElementById("searchRideBtn");
+
+    const vehicleSelect =
+        document.getElementById("vehicle");
+
+    const rideStatus =
+        document.getElementById("rideStatus");
+
+    const rideDetails =
+        document.getElementById("rideDetails");
+
+    const vehicleList =
+        document.getElementById("vehicleList");
+
+    const riderInfoCard =
+        document.getElementById("riderInfoCard");
 
 
-   
+    // ==================================================
+    // USER LOGIN
+    // ==================================================
 
-    // ✅ NEW: GET REAL COORDINATES
- async function searchPlaces(query, container, inputBox) {
-
-    if (query.length < 3) {
-        container.innerHTML = "";
-        return;
-    }
+    let loggedInUser = null;
 
     try {
-       const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=10&countrycodes=in&q=${query}`;
 
-        const res = await fetch(url, {
-            headers: {
-                "User-Agent": "FastGoApp/1.0"
-            }
-        });
-
-        const data = await res.json();
-
-        console.log("DATA:", data); // 🔥 debug
-
-        container.innerHTML = "";
-
-        if (!data || data.length === 0) {
-            container.innerHTML = "<div>No results</div>";
-            return;
-        }
-
-        data.slice(0, 5).forEach(place => {
-
-            const div = document.createElement("div");
-        div.innerText = place.display_name.split(",").slice(0, 4).join(",");
-            div.onclick = () => {
-                inputBox.value = place.display_name;
-                container.innerHTML = "";
-            };
-
-            container.appendChild(div);
-        });
-
-    } catch (err) {
-        console.log("Search error:", err);
-    }
-}
-
-    // ================= MAP INIT =================
-    map = L.map('map').setView([24.8170, 93.9368], 9);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: "© OpenStreetMap"
-    }).addTo(map);
-
-    // ================= AUTO LOCATION =================
-if (chooseBtn) {
-  chooseBtn.addEventListener("click", function () {
-
-    rideStatus.innerHTML = "📍 Fetching your location...";
-
-    navigator.geolocation.getCurrentPosition(
-        async function (pos) {
-
-            const userLat = pos.coords.latitude;
-            const userLng = pos.coords.longitude;
-
-            window.userLiveLat = userLat;
-            window.userLiveLng = userLng;
-
-            // ✅ Instantly show coordinates (fast UX like Uber)
-            pickupSelect.value = `${userLat.toFixed(5)}, ${userLng.toFixed(5)}`;
-
-            map.setView([userLat, userLng], 16, { animate: true });
-
-            if (window.userMarker) map.removeLayer(window.userMarker);
-
-            window.userMarker = L.marker([userLat, userLng])
-                .addTo(map)
-                .bindPopup("📍 You are here")
-                .openPopup();
-
-            // ✅ Background address fetch (no delay)
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLat}&lon=${userLng}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.display_name) {
-                        pickupSelect.value = data.display_name;
-                    }
-                });
-
-            rideStatus.innerHTML = "✅ Pickup location set";
-
-        },
-        function () {
-            rideStatus.innerHTML = "❌ Location permission denied";
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 5000
-        }
-    );
-});
-}
-
-    // ================= SEARCH RIDE =================
-    async function getCoordinates(place) {
-    try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${place}`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        if (!data || data.length === 0) {
-            alert("Location not found");
-            return null;
-        }
-
-        return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-
-    } catch (err) {
-        console.log("Geo Error:", err);
-        return null;
-    }
-}
-    searchBtn.addEventListener("click", async function () {
-
-
-        const pickup = pickupSelect.value;
-        const drop = dropSelect.value;
-        const vehicle = vehicleSelect.value;
-
-        if (!pickup || !drop) {
-            rideStatus.innerHTML = "Please enter pickup and drop.";
-            return;
-        }
-
-        if (pickup === drop) {
-            rideStatus.innerHTML = "Pickup & Drop cannot be same.";
-            return;
-        }
-
-        const pickupCoords = await getCoordinates(pickup);
-        const dropCoords = await getCoordinates(drop);
-
-        if (!pickupCoords || !dropCoords) return;
-
-        const [pickupLat, pickupLng] = pickupCoords;
-        const [dropLat, dropLng] = dropCoords;
-
-        if (routingControl) map.removeControl(routingControl);
-
-       routingControl = L.Routing.control({
-    waypoints: [
-        L.latLng(pickupLat, pickupLng),
-        L.latLng(dropLat, dropLng)
-    ],
-    routeWhileDragging: false,
-    addWaypoints: false,
-    show: false,
-    lineOptions: {
-        styles: [{ color: "#000", weight: 5 }]
-    }
-}).addTo(map);
-
-        routingControl.on('routesfound', function (e) {
-
-            const route = e.routes[0];
-        const distance = (route.summary.totalDistance / 1000).toFixed(2);
-
-// ✅ LIVE TIME ESTIMATE (NEW 🔥)
-const speed = vehicle === "Bike" ? 40 :
-              vehicle === "Auto" ? 30 : 35;
-
-const time = (distance / speed * 60).toFixed(0); // minutes
-let perKm = vehicle === "Bike" ? 10 :
-            vehicle === "Auto" ? 13 : 19;
-
-            const fare = Math.round(distance * perKm);
-window.currentFare = fare;
-     rideDetails.innerHTML = `
-<div style="
-    background:#ff6347;
-    padding:15px;
-    border-radius:12px;
-    box-shadow:0 4px 15px rgba(162, 40, 40, 0.15);
-    max-width:300px;
-">
-    🚗 Distance: <b>${distance} KM</b><br><br>
-    ⏱ ETA: <b>${time} min</b><br><br>
-    💰 Fare: <b>₹${fare}</b><br><br>
-
-    <button id="bookRideBtn" style="
-        width:100%;
-        background:#000;
-        color:#fff;
-        padding:12px;
-        border:none;
-        border-radius:10px;
-        font-size:16px;
-        cursor:pointer;
-    ">
-        Book Ride 🚖
-    </button>
-</div>
-`;
-        });
-
-        map.fitBounds([
-            [pickupLat, pickupLng],
-            [dropLat, dropLng]
-        ]);
-
-        showAllActiveRiders(vehicle, pickupLat, pickupLng);
-    });
-
-    // ================= BOOK RIDE =================
-    document.addEventListener("click", async function (e) {
-console.log("Clicked:", e.target.id);
-       if (e.target.id === "bookRideBtn") {
-
-    if (!nearestRider) {
-        alert("No rider available!");
-        return;
-    }
-
-    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
-
-    if (!loggedUser) {
-        alert("User not logged in!");
-        return;
-    }
-
-    const pickup = pickupSelect.value;
-    const drop = dropSelect.value;
-
- 
-
- const pickupCoords = await getCoordinates(pickup);
-const dropCoords = await getCoordinates(drop);
-
-    if (!pickupCoords || !dropCoords) return;
-
-    const [pickupLat, pickupLng] = pickupCoords;
-const [dropLat, dropLng] = dropCoords;
-
-   // ✅ SAVE CURRENT RIDE
-  localStorage.setItem("currentRide_" + loggedUser.number, JSON.stringify({
-    pickup,
-    drop,
-    pickupLat,
-    pickupLng,
-    dropLat,
-    dropLng,
-fare: window.currentFare || 0,
-    status: "ongoing"
-}));
-    const request = {
-        userName: loggedUser.name,
-        userPhone: loggedUser.number,
-        pickup,
-        drop,
-        pickupLat,
-        pickupLng,
-        dropLat,
-        dropLng,
-        fare: document.querySelector("#rideDetails").innerText.match(/\d+$/)?.[0] || 0,
-        payment: "cash",
-        time: new Date().toLocaleTimeString(),
-        status: "pending"
-    };
-
-    localStorage.setItem(
-        "rideRequest_" + nearestRider.phone,
-        JSON.stringify(request)
-    );
-
-    localStorage.setItem("currentBookedRider", nearestRider.phone);
-
-    rideStatus.innerHTML = "Ride Request Sent To " + nearestRider.name + " 🚀";
-    alert("Ride Request Sent 🚖");
-}
-    });
-
-    // ================= SHOW ALL ACTIVE RIDERS =================
-    function showAllActiveRiders(vehicleType, userLat, userLng) {
-    
-
-        vehicleList.innerHTML = "";
-
-        Object.values(riderMarkers).forEach(marker => map.removeLayer(marker));
-        riderMarkers = {};
-
-        let riders = [];
-
-        for (let i = 0; i < localStorage.length; i++) {
-
-            const key = localStorage.key(i);
-            if (!key.startsWith("activeRider_")) continue;
-
-            const activeRider = JSON.parse(localStorage.getItem(key));
-
-            if (!activeRider.online) continue;
-            if (activeRider.vehicle !== vehicleType) continue;
-
-            const distance = getDistance(
-                userLat,
-                userLng,
-                activeRider.lat,
-                activeRider.lng
+        loggedInUser =
+            JSON.parse(
+                localStorage.getItem("loggedInUser")
             );
 
-            const riderNumber = key.replace("activeRider_", "").trim();
+    } catch (error) {
 
-            riders.push({
-                ...activeRider,
-                phone: activeRider.phone || riderNumber,
-                distance
-            });
+        loggedInUser = null;
+    }
+
+
+    if (!loggedInUser) {
+
+        alert("Please login first.");
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+    // ==================================================
+// RESET OLD PENDING RIDE AFTER PAGE REFRESH
+// ==================================================
+
+function resetOldPendingRide() {
+
+    const savedRide = localStorage.getItem("activeUserRide");
+
+    if (!savedRide) {
+        return;
+    }
+
+    try {
+
+        const ride = JSON.parse(savedRide);
+
+        // If the previous ride was only pending,
+        // remove it when user opens/refreshes booking page.
+        if (ride && ride.status === "pending") {
+
+            if (ride.riderPhone) {
+
+                localStorage.removeItem(
+                    "rideRequest_" + ride.riderPhone
+                );
+            }
+
+            localStorage.removeItem("activeUserRide");
+
         }
 
-        riders.sort((a, b) => a.distance - b.distance);
-        nearestRider = riders[0];
+    } catch (error) {
 
-        if (riders.length === 0) {
-            vehicleList.innerHTML = "<p>No active riders found.</p>";
+        console.error(
+            "Invalid old ride data:",
+            error
+        );
+
+        localStorage.removeItem("activeUserRide");
+    }
+}
+
+resetOldPendingRide();
+
+
+    // ==================================================
+    // MAP
+    // ==================================================
+
+    const map =
+        L.map("map").setView(
+            [23.8315, 91.2868],
+            6
+        );
+
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution:
+                "© OpenStreetMap contributors",
+
+            maxZoom: 19
+        }
+    ).addTo(map);
+
+
+    // ==================================================
+    // MAP VARIABLES
+    // ==================================================
+
+    let pickupMarker = null;
+
+    let dropMarker = null;
+
+    let riderMarker = null;
+
+    let routingControl = null;
+
+    let pickupLocation = null;
+
+    let dropLocation = null;
+
+    let currentDistance = 0;
+
+    let currentFare = 0;
+
+    let riderLocationTimer = null;
+
+
+    // ==================================================
+    // LOCATION SEARCH
+    // ==================================================
+
+    let pickupTimer = null;
+
+    let dropTimer = null;
+
+
+    async function searchLocation(
+        query,
+        suggestionBox,
+        inputElement,
+        locationType
+    ) {
+
+        query = query.trim();
+
+
+        if (query.length < 2) {
+
+            suggestionBox.innerHTML = "";
+
             return;
         }
 
-        rideStatus.innerHTML = "Active Riders Found 🚖";
 
-        riders.forEach(rider => {
-                const liveDistance = getDistance(
-    window.userLiveLat || userLat,
-    window.userLiveLng || userLng,
-    rider.lat,
-    rider.lng
-);
+        suggestionBox.innerHTML =
+            '<div class="suggestion-loading">' +
+            'Searching locations...' +
+            '</div>';
 
-            const marker = L.marker([rider.lat, rider.lng])
-                .addTo(map)
-                .bindPopup(`
-                    <b>${rider.name}</b><br>
-                    ${rider.vehicle}<br>
-                    ${rider.plate}<br>
-                    ${rider.phone}
-                `);
 
-            riderMarkers[rider.phone] = marker;
+        try {
 
-            const box = document.createElement("div");
-            box.className = "rider-box";
+            const url =
+                "https://nominatim.openstreetmap.org/search?" +
+                new URLSearchParams({
 
-            box.innerHTML = `
-                <div style="display:flex; gap:15px;">
-                    <img src="${rider.image}" width="90" style="border-radius:10px;">
-                    <div>
-                        <h3>${rider.name}</h3>
-                        <p><strong>Phone:</strong> ${rider.phone}</p>
-                        <p><strong>Vehicle:</strong> ${rider.vehicle}</p>
-                        <p><strong>Plate:</strong> ${rider.plate}</p>
-                       <p><strong>Distance:</strong> ${liveDistance.toFixed(2)} KM</p>
-                        <p><strong>Status:</strong> 🟢 Online</p>
-                    </div>
-                </div>
-            `;
+                    q: query,
 
-            vehicleList.appendChild(box);
-        });
+                    format: "json",
+
+                    addressdetails: "1",
+
+                    limit: "10",
+
+                    countrycodes: "in",
+
+                    "accept-language": "en"
+
+                });
+
+
+            const response =
+                await fetch(url);
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Location search failed"
+                );
+            }
+
+
+            const results =
+                await response.json();
+
+
+            suggestionBox.innerHTML = "";
+
+
+            if (
+                !results ||
+                results.length === 0
+            ) {
+
+                suggestionBox.innerHTML =
+                    '<div class="no-result">' +
+                    'No location found. Try the full name, nearby city, or district.' +
+                    '</div>';
+
+                return;
+            }
+
+
+            results.forEach(function (place) {
+
+                const item =
+                    document.createElement("div");
+
+
+                item.className =
+                    "suggestion-item";
+
+
+                item.textContent =
+                    place.display_name;
+
+
+                item.addEventListener(
+                    "click",
+                    function () {
+
+                        const lat =
+                            parseFloat(place.lat);
+
+                        const lng =
+                            parseFloat(place.lon);
+
+
+                        const location = {
+
+                            lat: lat,
+
+                            lng: lng,
+
+                            name:
+                                place.display_name
+
+                        };
+
+
+                        inputElement.value =
+                            place.display_name;
+
+
+                        suggestionBox.innerHTML =
+                            "";
+
+
+                        if (
+                            locationType ===
+                            "pickup"
+                        ) {
+
+                            pickupLocation =
+                                location;
+
+
+                            setPickupMarker(
+                                lat,
+                                lng,
+                                place.display_name
+                            );
+
+                        } else {
+
+                            dropLocation =
+                                location;
+
+
+                            setDropMarker(
+                                lat,
+                                lng,
+                                place.display_name
+                            );
+                        }
+
+
+                        map.setView(
+                            [lat, lng],
+                            15
+                        );
+
+
+                        drawRouteIfReady();
+                    }
+                );
+
+
+                suggestionBox.appendChild(
+                    item
+                );
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Location Error:",
+                error
+            );
+
+
+            suggestionBox.innerHTML =
+                '<div class="no-result">' +
+                'Location service unavailable. Check your internet connection and try again.' +
+                '</div>';
+        }
     }
 
-    function getDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
 
-        const a =
-            Math.sin(dLat / 2) ** 2 +
-            Math.cos(lat1 * Math.PI / 180) *
-            Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) ** 2;
+    // ==================================================
+    // PICKUP SEARCH
+    // ==================================================
 
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    }
-    setInterval(() => {
+    pickupInput.addEventListener(
+        "input",
+        function () {
 
-    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (!loggedUser) return;
+            clearTimeout(
+                pickupTimer
+            );
 
-    const ride = JSON.parse(localStorage.getItem("currentRide_" + loggedUser.number));
-    if (!ride) return;
 
-    navigator.geolocation.getCurrentPosition(pos => {
+            const query =
+                pickupInput.value.trim();
 
-        const userLat = pos.coords.latitude;
-        const userLng = pos.coords.longitude;
 
-        const distance = getDistance(
-            userLat,
-            userLng,
-            ride.dropLat,
-            ride.dropLng
-        );
+            /*
+             * If user changes the selected
+             * location manually, remove
+             * the old coordinates.
+             */
 
-        console.log("Distance to destination:", distance);
+            pickupLocation = null;
 
-        // ✅ AUTO COMPLETE (within 0.1 km = 100m)
-        if (distance < 0.1) {
-            completeRide(loggedUser.number);
+
+            pickupTimer =
+                setTimeout(
+                    function () {
+
+                        searchLocation(
+                            query,
+                            pickupSuggestions,
+                            pickupInput,
+                            "pickup"
+                        );
+
+                    },
+                    400
+                );
+        }
+    );
+
+
+    // ==================================================
+    // DROP SEARCH
+    // ==================================================
+
+    dropInput.addEventListener(
+        "input",
+        function () {
+
+            clearTimeout(
+                dropTimer
+            );
+
+
+            const query =
+                dropInput.value.trim();
+
+
+            dropLocation = null;
+
+
+            dropTimer =
+                setTimeout(
+                    function () {
+
+                        searchLocation(
+                            query,
+                            dropSuggestions,
+                            dropInput,
+                            "drop"
+                        );
+
+                    },
+                    400
+                );
+        }
+    );
+
+
+    // ==================================================
+    // CLOSE SUGGESTIONS
+    // ==================================================
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                !pickupInput.contains(
+                    event.target
+                ) &&
+                !pickupSuggestions.contains(
+                    event.target
+                )
+            ) {
+
+                pickupSuggestions.innerHTML =
+                    "";
+            }
+
+
+            if (
+                !dropInput.contains(
+                    event.target
+                ) &&
+                !dropSuggestions.contains(
+                    event.target
+                )
+            ) {
+
+                dropSuggestions.innerHTML =
+                    "";
+            }
+        }
+    );
+
+
+    // ==================================================
+    // PICKUP MARKER
+    // ==================================================
+
+    function setPickupMarker(
+        lat,
+        lng,
+        name
+    ) {
+
+        if (pickupMarker) {
+
+            pickupMarker.setLatLng(
+                [lat, lng]
+            );
+
+        } else {
+
+            pickupMarker =
+                L.marker(
+                    [lat, lng]
+                ).addTo(map);
         }
 
-    });
 
-}, 5000); // every 5 sec
+        pickupMarker.bindPopup(
+            "<b>Pickup</b><br>" +
+            name
+        );
+    }
+
+
+    // ==================================================
+    // DROP MARKER
+    // ==================================================
+
+    function setDropMarker(
+        lat,
+        lng,
+        name
+    ) {
+
+        if (dropMarker) {
+
+            dropMarker.setLatLng(
+                [lat, lng]
+            );
+
+        } else {
+
+            dropMarker =
+                L.marker(
+                    [lat, lng]
+                ).addTo(map);
+        }
+
+
+        dropMarker.bindPopup(
+            "<b>Destination</b><br>" +
+            name
+        );
+    }
+
+
+    // ==================================================
+    // DRAW ROUTE
+    // ==================================================
+
+    function drawRouteIfReady() {
+
+        if (
+            !pickupLocation ||
+            !dropLocation
+        ) {
+
+            return;
+        }
+
+
+        if (routingControl) {
+
+            map.removeControl(
+                routingControl
+            );
+
+            routingControl =
+                null;
+        }
+
+
+        routingControl =
+            L.Routing.control({
+
+                waypoints: [
+
+                    L.latLng(
+                        pickupLocation.lat,
+                        pickupLocation.lng
+                    ),
+
+                    L.latLng(
+                        dropLocation.lat,
+                        dropLocation.lng
+                    )
+
+                ],
+
+                routeWhileDragging:
+                    false,
+
+                addWaypoints:
+                    false,
+
+                draggableWaypoints:
+                    false,
+
+                fitSelectedRoutes:
+                    true,
+
+                showAlternatives:
+                    false,
+
+                createMarker:
+                    function () {
+
+                        return null;
+                    }
+
+            }).addTo(map);
+
+
+        routingControl.on(
+            "routesfound",
+            function (event) {
+
+                const route =
+                    event.routes[0];
+
+
+                currentDistance =
+                    route.summary.totalDistance /
+                    1000;
+
+
+                const duration =
+                    route.summary.totalTime /
+                    60;
+
+
+                calculateFare();
+
+
+                rideDetails.innerHTML =
+                    "";
+
+
+                const distanceText =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                distanceText.innerHTML =
+                    "<strong>Distance:</strong> " +
+                    currentDistance.toFixed(2) +
+                    " KM";
+
+
+                const timeText =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                timeText.innerHTML =
+                    "<strong>Estimated Time:</strong> " +
+                    Math.ceil(duration) +
+                    " minutes";
+
+
+                const vehicleText =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                vehicleText.innerHTML =
+                    "<strong>Vehicle:</strong> " +
+                    vehicleSelect.value;
+
+
+                const fareText =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                fareText.innerHTML =
+                    "<strong>Estimated Fare:</strong> ₹" +
+                    currentFare;
+
+
+                rideDetails.appendChild(
+                    distanceText
+                );
+
+
+                rideDetails.appendChild(
+                    timeText
+                );
+
+
+                rideDetails.appendChild(
+                    vehicleText
+                );
+
+
+                rideDetails.appendChild(
+                    fareText
+                );
+            }
+        );
+    }
+
+
+    // ==================================================
+    // FARE
+    // ==================================================
+
+    function calculateFare() {
+
+        if (
+            currentDistance <= 0
+        ) {
+
+            return;
+        }
+
+
+        let rate;
+
+
+        if (
+            vehicleSelect.value ===
+            "Bike"
+        ) {
+
+            rate = 10;
+
+        } else if (
+            vehicleSelect.value ===
+            "Auto"
+        ) {
+
+            rate = 13;
+
+        } else {
+
+            rate = 19;
+        }
+
+
+        currentFare =
+            Math.max(
+                30,
+                Math.round(
+                    currentDistance *
+                    rate
+                )
+            );
+
+
+        updateRideDetails();
+    }
+
+
+    function updateRideDetails() {
+
+        if (
+            currentDistance <= 0
+        ) {
+
+            return;
+        }
+
+
+        rideDetails.innerHTML =
+            "<p><strong>Distance:</strong> " +
+            currentDistance.toFixed(2) +
+            " KM</p>" +
+
+            "<p><strong>Vehicle:</strong> " +
+            vehicleSelect.value +
+            "</p>" +
+
+            "<p><strong>Estimated Fare:</strong> ₹" +
+            currentFare +
+            "</p>";
+    }
+
+
+    // ==================================================
+    // VEHICLE CHANGE
+    // ==================================================
+
+    vehicleSelect.addEventListener(
+        "change",
+        function () {
+
+            if (
+                currentDistance > 0
+            ) {
+
+                calculateFare();
+            }
+
+            if (
+                pickupLocation
+            ) {
+
+                showNearbyRiders();
+            }
+        }
+    );
+
+
+    // ==================================================
+    // LIVE LOCATION
+    // ==================================================
+
+    chooseLocationBtn.addEventListener(
+        "click",
+        function () {
+
+            if (
+                !navigator.geolocation
+            ) {
+
+                alert(
+                    "Your browser does not support location."
+                );
+
+                return;
+            }
+
+
+            chooseLocationBtn.disabled =
+                true;
+
+
+            chooseLocationBtn.textContent =
+                "Getting location...";
+
+
+            navigator.geolocation.getCurrentPosition(
+
+                function (position) {
+
+                    const lat =
+                        position.coords.latitude;
+
+                    const lng =
+                        position.coords.longitude;
+
+
+                    pickupLocation = {
+
+                        lat: lat,
+
+                        lng: lng,
+
+                        name:
+                            "My Live Location"
+
+                    };
+
+
+                    pickupInput.value =
+                        "My Live Location";
+
+
+                    setPickupMarker(
+                        lat,
+                        lng,
+                        "Your Live Location"
+                    );
+
+
+                    map.setView(
+                        [lat, lng],
+                        16
+                    );
+
+
+                    chooseLocationBtn.disabled =
+                        false;
+
+
+                    chooseLocationBtn.textContent =
+                        "📍 Use Live Location";
+
+
+                    showNearbyRiders();
+
+
+                    drawRouteIfReady();
+
+                },
+
+
+                function (error) {
+
+                    console.error(
+                        error
+                    );
+
+
+                    chooseLocationBtn.disabled =
+                        false;
+
+
+                    chooseLocationBtn.textContent =
+                        "📍 Use Live Location";
+
+
+                    alert(
+                        "Unable to get your location. Please allow location permission."
+                    );
+                },
+
+
+                {
+
+                    enableHighAccuracy:
+                        true,
+
+                    timeout:
+                        15000,
+
+                    maximumAge:
+                        0
+
+                }
+            );
+        }
+    );
+
+
+    // ==================================================
+    // GET ACTIVE RIDERS
+    // ==================================================
+
+    function getActiveRiders() {
+
+        const riders = [];
+
+
+        for (
+            let i = 0;
+            i < localStorage.length;
+            i++
+        ) {
+
+            const key =
+                localStorage.key(i);
+
+
+            if (
+                key &&
+                key.startsWith(
+                    "activeRider_"
+                )
+            ) {
+
+                try {
+
+                    const rider =
+                        JSON.parse(
+                            localStorage.getItem(
+                                key
+                            )
+                        );
+
+
+                    if (
+                        rider &&
+                        rider.online === true &&
+                        typeof rider.lat ===
+                        "number" &&
+                        typeof rider.lng ===
+                        "number"
+                    ) {
+
+                        riders.push(
+                            rider
+                        );
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        "Invalid rider:",
+                        error
+                    );
+                }
+            }
+        }
+
+
+        return riders;
+    }
+
+
+    // ==================================================
+    // DISTANCE
+    // ==================================================
+
+    function distanceBetween(
+        lat1,
+        lon1,
+        lat2,
+        lon2
+    ) {
+
+        const R = 6371;
+
+
+        const dLat =
+            (lat2 - lat1) *
+            Math.PI / 180;
+
+
+        const dLon =
+            (lon2 - lon1) *
+            Math.PI / 180;
+
+
+        const a =
+            Math.sin(
+                dLat / 2
+            ) ** 2 +
+
+            Math.cos(
+                lat1 *
+                Math.PI / 180
+            ) *
+
+            Math.cos(
+                lat2 *
+                Math.PI / 180
+            ) *
+
+            Math.sin(
+                dLon / 2
+            ) ** 2;
+
+
+        const c =
+            2 *
+            Math.atan2(
+                Math.sqrt(a),
+                Math.sqrt(1 - a)
+            );
+
+
+        return R * c;
+    }
+
+
+    // ==================================================
+    // SHOW NEARBY RIDERS
+    // ==================================================
+
+    function showNearbyRiders() {
+
+        vehicleList.innerHTML =
+            "";
+
+
+        if (
+            !pickupLocation
+        ) {
+
+            return [];
+        }
+
+
+        const selectedVehicle =
+            vehicleSelect.value;
+
+
+        let riders =
+            getActiveRiders()
+            .filter(
+                function (rider) {
+
+                    return (
+                        rider.vehicle &&
+                        rider.vehicle.toLowerCase() ===
+                        selectedVehicle.toLowerCase()
+                    );
+                }
+            );
+
+
+        riders =
+            riders.map(
+                function (rider) {
+
+                    return {
+
+                        ...rider,
+
+                        distance:
+                            distanceBetween(
+                                pickupLocation.lat,
+                                pickupLocation.lng,
+                                rider.lat,
+                                rider.lng
+                            )
+                    };
+                }
+            );
+
+
+        riders.sort(
+            function (a, b) {
+
+                return (
+                    a.distance -
+                    b.distance
+                );
+            }
+        );
+
+
+        if (
+            riders.length === 0
+        ) {
+
+            const message =
+                document.createElement(
+                    "p"
+                );
+
+
+            message.textContent =
+                "No " +
+                selectedVehicle +
+                " rider is currently online.";
+
+
+            vehicleList.appendChild(
+                message
+            );
+
+
+            return [];
+        }
+
+
+        riders.forEach(rider => {
+
+    const card = document.createElement("div");
+
+    card.className = "ride-card-user";
+
+    card.innerHTML = `
+        <h3>🚕 ${rider.name || "Rider"}</h3>
+
+        <p>
+            <strong>Vehicle:</strong>
+            ${rider.vehicle || "Not available"}
+        </p>
+
+        <p>
+            <strong>Plate:</strong>
+            ${rider.plate || "Not available"}
+        </p>
+
+        <p>
+            <strong>Mobile:</strong>
+            ${rider.phone || "Not available"}
+        </p>
+
+        <p>
+            <strong>Distance:</strong>
+            ${rider.distance.toFixed(2)} KM
+        </p>
+
+        <p>
+            <span class="online-status">
+                🟢 Online
+            </span>
+        </p>
+    `;
+
+    vehicleList.appendChild(card);
+});
+
+        return riders;
+    }
+
+
+    // ==================================================
+    // REQUEST RIDE
+    // ==================================================
+
+    searchRideBtn.addEventListener(
+        "click",
+        function () {
+
+            if (
+                !pickupLocation
+            ) {
+
+                alert(
+                    "Please select your pickup location from the suggestions."
+                );
+
+                return;
+            }
+
+
+            if (
+                !dropLocation
+            ) {
+
+                alert(
+                    "Please select your destination from the suggestions."
+                );
+
+                return;
+            }
+
+
+            if (
+                currentFare <= 0
+            ) {
+
+                alert(
+                    "Please wait for the route calculation."
+                );
+
+                return;
+            }
+
+
+            const riders =
+                showNearbyRiders();
+
+
+            if (
+                riders.length === 0
+            ) {
+
+                alert(
+                    "No online rider is available for this vehicle."
+                );
+
+                return;
+            }
+
+
+            const rider =
+                riders[0];
+
+
+            const rideId =
+                "ride_" +
+                Date.now();
+
+
+            const rideRequest = {
+
+                id:
+                    rideId,
+
+                userName:
+                    loggedInUser.name ||
+                    "User",
+
+                userPhone:
+                    loggedInUser.number ||
+                    loggedInUser.phone ||
+                    "",
+
+                userEmail:
+                    loggedInUser.email ||
+                    "",
+
+                pickup:
+                    pickupLocation.name,
+
+                drop:
+                    dropLocation.name,
+
+                pickupLat:
+                    pickupLocation.lat,
+
+                pickupLng:
+                    pickupLocation.lng,
+
+                dropLat:
+                    dropLocation.lat,
+
+                dropLng:
+                    dropLocation.lng,
+
+                vehicle:
+                    vehicleSelect.value,
+
+                fare:
+                    currentFare,
+
+                distance:
+                    Number(
+                        currentDistance.toFixed(2)
+                    ),
+
+                riderPhone:
+                    rider.phone,
+
+                riderName:
+                    rider.name,
+
+                riderVehicle:
+                    rider.vehicle,
+
+                riderPlate:
+                    rider.plate,
+
+                status:
+                    "pending",
+
+                createdAt:
+                    new Date().toISOString()
+            };
+
+
+            // SEND TO RIDER
+
+            localStorage.setItem(
+                "rideRequest_" +
+                rider.phone,
+
+                JSON.stringify(
+                    rideRequest
+                )
+            );
+
+
+            // SAVE USER RIDE
+
+            localStorage.setItem(
+                "activeUserRide",
+
+                JSON.stringify(
+                    rideRequest
+                )
+            );
+
+
+            rideStatus.textContent =
+                "🚕 Ride request sent to " +
+                rider.name +
+                ". Waiting for acceptance...";
+
+
+            searchRideBtn.disabled =
+                true;
+
+
+            searchRideBtn.textContent =
+                "Ride Requested";
+
+
+            startRideStatusListener();
+        }
+    );
+
+
+    // ==================================================
+    // RIDE STATUS LISTENER
+    // ==================================================
+
+    let rideStatusTimer = null;
+
+
+    function startRideStatusListener() {
+
+        if (
+            rideStatusTimer
+        ) {
+
+            clearInterval(
+                rideStatusTimer
+            );
+        }
+
+
+        rideStatusTimer =
+            setInterval(
+                function () {
+
+                    const ride =
+                        getActiveRide();
+
+
+                    if (!ride) {
+
+                        return;
+                    }
+
+
+                    if (
+                        ride.status ===
+                        "accepted"
+                    ) {
+
+                        clearInterval(
+                            rideStatusTimer
+                        );
+
+
+                        showAcceptedRider(
+                            ride
+                        );
+                    }
+
+
+                    if (
+                        ride.status ===
+                        "rejected"
+                    ) {
+
+                        clearInterval(
+                            rideStatusTimer
+                        );
+
+
+                        rideStatus.textContent =
+                            "❌ Rider rejected the request.";
+
+
+                        searchRideBtn.disabled =
+                            false;
+
+
+                        searchRideBtn.textContent =
+                            "Request Ride";
+                    }
+
+
+                    if (
+                        ride.status ===
+                        "completed"
+                    ) {
+
+                        clearInterval(
+                            rideStatusTimer
+                        );
+
+
+                        rideStatus.textContent =
+                            "✅ Ride Completed";
+
+                        searchRideBtn.disabled =
+                            false;
+
+                        searchRideBtn.textContent =
+                            "Request Ride";
+                    }
+
+                },
+                1000
+            );
+    }
+
+
+    // ==================================================
+    // GET ACTIVE RIDE
+    // ==================================================
+
+    function getActiveRide() {
+
+        try {
+
+            return JSON.parse(
+                localStorage.getItem(
+                    "activeUserRide"
+                )
+            );
+
+        } catch (error) {
+
+            return null;
+        }
+    }
+
+
+    // ==================================================
+    // SHOW ACCEPTED RIDER
+    // ==================================================
+
+    function showAcceptedRider(
+        ride
+    ) {
+
+        riderInfoCard.style.display =
+            "block";
+
+
+        document.getElementById(
+            "acceptedRiderName"
+        ).textContent =
+            ride.riderName ||
+            "Rider";
+
+
+        document.getElementById(
+            "acceptedRiderPhone"
+        ).textContent =
+            ride.riderPhone ||
+            "";
+
+
+        document.getElementById(
+            "acceptedRiderVehicle"
+        ).textContent =
+            ride.riderVehicle ||
+            ride.vehicle ||
+            "";
+
+
+        document.getElementById(
+            "acceptedRiderPlate"
+        ).textContent =
+            ride.riderPlate ||
+            "";
+
+
+        document.getElementById(
+            "acceptedRiderStatus"
+        ).textContent =
+            "Ride Accepted ✅";
+
+
+        rideStatus.textContent =
+            "🎉 Your rider has accepted the ride. Rider is coming to your pickup location.";
+
+
+        searchRideBtn.disabled =
+            false;
+
+
+        searchRideBtn.textContent =
+            "Request Ride";
+
+
+        startRiderLocationTracking(
+            ride.riderPhone
+        );
+    }
+
+
+    // ==================================================
+    // RIDER LIVE LOCATION
+    // ==================================================
+
+    function startRiderLocationTracking(
+        riderPhone
+    ) {
+
+        if (
+            riderLocationTimer
+        ) {
+
+            clearInterval(
+                riderLocationTimer
+            );
+        }
+
+
+        riderLocationTimer =
+            setInterval(
+                function () {
+
+                    try {
+
+                        const rider =
+                            JSON.parse(
+                                localStorage.getItem(
+                                    "activeRider_" +
+                                    riderPhone
+                                )
+                            );
+
+
+                        if (
+                            !rider ||
+                            rider.online !== true
+                        ) {
+
+                            return;
+                        }
+
+
+                        if (
+                            typeof rider.lat !==
+                            "number" ||
+                            typeof rider.lng !==
+                            "number"
+                        ) {
+
+                            return;
+                        }
+
+
+                        if (
+                            !riderMarker
+                        ) {
+
+                            riderMarker =
+                                L.marker(
+                                    [
+                                        rider.lat,
+                                        rider.lng
+                                    ]
+                                )
+                                .addTo(map)
+                                .bindPopup(
+                                    "🚗 Your Rider"
+                                );
+
+                        } else {
+
+                            riderMarker.setLatLng(
+                                [
+                                    rider.lat,
+                                    rider.lng
+                                ]
+                            );
+                        }
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Rider location error:",
+                            error
+                        );
+                    }
+
+                },
+                1000
+            );
+    }
+
+
+    // ==================================================
+    // EXISTING RIDE
+    // ==================================================
+
+    const existingRide =
+        getActiveRide();
+
+
+    if (
+        existingRide
+    ) {
+
+        if (
+            existingRide.status ===
+            "accepted"
+        ) {
+
+            showAcceptedRider(
+                existingRide
+            );
+
+        } else if (
+            existingRide.status ===
+            "pending"
+        ) {
+
+            rideStatus.textContent =
+                "🚕 Your ride request is still waiting for rider acceptance.";
+
+            searchRideBtn.disabled =
+                true;
+
+            searchRideBtn.textContent =
+                "Ride Requested";
+
+            startRideStatusListener();
+        }
+    }
+
+
+    // ==================================================
+    // REFRESH RIDER LIST
+    // ==================================================
+
+    setInterval(
+        function () {
+
+            if (
+                pickupLocation
+            ) {
+
+                showNearbyRiders();
+            }
+
+        },
+        3000
+    );
 
 });
-function completeRide(userNumber) {
-
-    const currentRide = JSON.parse(localStorage.getItem("currentRide_" + userNumber));
-    if (!currentRide) return;
-
-    let history = JSON.parse(localStorage.getItem("rides_" + userNumber)) || [];
-
-    history.push({
-        pickup: currentRide.pickup,
-        drop: currentRide.drop,
-        fare: currentRide.fare,
-        time: new Date().toLocaleString()
-    });
-
-    localStorage.setItem("rides_" + userNumber, JSON.stringify(history));
-    localStorage.removeItem("currentRide_" + userNumber);
-
-    document.getElementById("rideStatus").innerHTML = "✅ Ride Completed";
-
-    alert("Ride Completed 🎉");
-}
