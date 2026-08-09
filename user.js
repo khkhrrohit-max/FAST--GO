@@ -37,7 +37,7 @@ async function sendOTP(email, otp){
         }
     );
 
-    alert("Email Sent");
+    
     return response;
 }
 
@@ -53,7 +53,7 @@ if(signupBtn){
 
     signupBtn.addEventListener("click", async ()=>{
 
-        alert("Button Clicked");
+       
 
         const name=document.getElementById("signupName").value.trim();
         const number=document.getElementById("signupNumber").value.trim();
