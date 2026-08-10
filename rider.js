@@ -6,12 +6,500 @@ emailjs.init({
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    
 let generatedOTP = "";
 let otpVerified = false;
 let otpExpireTime = 0;
 
 let timer;
 let timeLeft = 60;
+// ======================================================
+// FAST GO RIDER ID
+// ======================================================
+
+function generateRiderID() {
+
+    const randomNumber =
+        Math.floor(100000 + Math.random() * 900000);
+
+    return "FG-R-" + randomNumber;
+}
+
+
+// ======================================================
+// CREATE FAST GO RIDER CARD PDF
+// ======================================================
+
+async function downloadRiderCard(rider) {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc =
+        new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "A4"
+        });
+
+
+    // ===============================
+    // CARD POSITION
+    // ===============================
+
+    const x = 25;
+    const y = 45;
+    const width = 160;
+    const height = 105;
+
+
+    // ===============================
+    // CARD BACKGROUND
+    // ===============================
+
+    doc.setFillColor(245, 247, 250);
+
+    doc.roundedRect(
+        x,
+        y,
+        width,
+        height,
+        8,
+        8,
+        "F"
+    );
+
+
+    // ===============================
+    // ORANGE HEADER
+    // ===============================
+
+    doc.setFillColor(255, 106, 0);
+
+    doc.roundedRect(
+        x,
+        y,
+        width,
+        30,
+        8,
+        8,
+        "F"
+    );
+
+    // Cover lower rounded corners of header
+    doc.rect(
+        x,
+        y + 20,
+        width,
+        10,
+        "F"
+    );
+
+
+    // ===============================
+    // FAST GO LOGO
+    // ===============================
+
+    try {
+
+        const logo =
+            await loadImage(
+                "fast go 2.jpeg"
+            );
+
+        doc.addImage(
+            logo,
+            "JPEG",
+            x + 8,
+            y + 5,
+            20,
+            20
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Logo could not be loaded:",
+            error
+        );
+    }
+
+
+    // ===============================
+    // FAST GO TITLE
+    // ===============================
+
+    doc.setTextColor(
+        255,
+        255,
+        255
+    );
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(22);
+
+    doc.text(
+        "FAST GO",
+        x + 35,
+        y + 14
+    );
+
+
+    doc.setFontSize(9);
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.text(
+        "RIDER IDENTIFICATION CARD",
+        x + 35,
+        y + 21
+    );
+
+
+    // ===============================
+    // RIDER DETAILS
+    // ===============================
+
+    doc.setTextColor(
+        40,
+        40,
+        40
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(11);
+
+    doc.text(
+        "RIDER DETAILS",
+        x + 10,
+        y + 42
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.setFontSize(10);
+
+
+    // Name
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.text(
+        "Name:",
+        x + 10,
+        y + 52
+    );
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.text(
+        rider.name,
+        x + 40,
+        y + 52
+    );
+
+
+    // Email
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.text(
+        "Email:",
+        x + 10,
+        y + 62
+    );
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.text(
+        rider.email,
+        x + 40,
+        y + 62
+    );
+
+
+    // Mobile
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.text(
+        "Mobile:",
+        x + 10,
+        y + 72
+    );
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.text(
+        rider.number,
+        x + 40,
+        y + 72
+    );
+
+
+    // Rider ID
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.text(
+        "Rider ID:",
+        x + 10,
+        y + 82
+    );
+
+
+    doc.setTextColor(
+        255,
+        106,
+        0
+    );
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.text(
+        rider.riderId,
+        x + 40,
+        y + 82
+    );
+
+
+    // ===============================
+    // VERIFICATION TEXT
+    // ===============================
+
+    doc.setTextColor(
+        80,
+        80,
+        80
+    );
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.setFontSize(8);
+
+    doc.text(
+        "This card confirms FAST GO rider registration.",
+        x + 10,
+        y + 93
+    );
+
+
+    // ===============================
+    // FOOTER
+    // ===============================
+
+    doc.setDrawColor(
+        220,
+        220,
+        220
+    );
+
+    doc.line(
+        x + 10,
+        y + 98,
+        x + width - 10,
+        y + 98
+    );
+
+
+    doc.setTextColor(
+        50,
+        50,
+        50
+    );
+
+    doc.setFontSize(8);
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.text(
+        "FAST GO",
+        x + 10,
+        y + 104
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.text(
+        "Rohit Khokhar • Founder",
+        x + 45,
+        y + 104
+    );
+
+    doc.text(
+        "khkhrrohit@gmail.com",
+        x + 105,
+        y + 104
+    );
+
+
+    // ===============================
+    // PAGE TITLE
+    // ===============================
+
+    doc.setTextColor(
+        255,
+        106,
+        0
+    );
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(24);
+
+    doc.text(
+        "FAST GO",
+        105,
+        25,
+        {
+            align: "center"
+        }
+    );
+
+
+    doc.setTextColor(
+        80,
+        80,
+        80
+    );
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.setFontSize(11);
+
+    doc.text(
+        "Official Rider Registration Card",
+        105,
+        32,
+        {
+            align: "center"
+        }
+    );
+
+
+    // ===============================
+    // DOWNLOAD
+    // ===============================
+
+    doc.save(
+        "FAST_GO_Rider_Card_" +
+        rider.riderId +
+        ".pdf"
+    );
+}
+
+
+// ======================================================
+// LOAD LOGO
+// ======================================================
+
+function loadImage(src) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const img =
+                new Image();
+
+            img.onload =
+                function () {
+
+                    const canvas =
+                        document.createElement(
+                            "canvas"
+                        );
+
+                    canvas.width =
+                        img.width;
+
+                    canvas.height =
+                        img.height;
+
+
+                    const ctx =
+                        canvas.getContext(
+                            "2d"
+                        );
+
+
+                    ctx.drawImage(
+                        img,
+                        0,
+                        0
+                    );
+
+
+                    resolve(
+                        canvas.toDataURL(
+                            "image/jpeg"
+                        )
+                    );
+                };
+
+
+            img.onerror =
+                reject;
+
+
+            img.src = src;
+        }
+    );
+}
 
 // ================= FUNCTIONS =================
 
@@ -228,16 +716,23 @@ submitBtn.addEventListener("click",async(e)=>{
 
     e.preventDefault();
 
-    const rider={
+    const rider = {
 
-        name:nameInput.value.trim(),
-        number:numberInput.value.trim(),
-        email:emailInput.value.trim(),
-        vehicle:vehicle.value,
-        plate:plateInput.value.trim().toUpperCase(),
-        signupTime:new Date().toISOString()
+    name: nameInput.value.trim(),
 
-    };
+    number: numberInput.value.trim(),
+
+    email: emailInput.value.trim(),
+
+    vehicle: vehicle.value,
+
+    plate: plateInput.value.trim().toUpperCase(),
+
+    riderId: generateRiderID(),
+
+    signupTime: new Date().toISOString()
+
+};
 
     if(rider.name=="" || rider.number=="" || rider.email=="" || rider.plate==""){
 
@@ -283,19 +778,57 @@ submitBtn.addEventListener("click",async(e)=>{
 
     }
 
-    localStorage.setItem(
-        "rider_"+rider.number,
-        JSON.stringify(rider)
+    // ==================================================
+// SAVE RIDER ACCOUNT
+// ==================================================
+
+localStorage.setItem(
+    "rider_" + rider.number,
+    JSON.stringify(rider)
+);
+
+
+localStorage.setItem(
+    "loggedInRider",
+    JSON.stringify(rider)
+);
+
+
+// ==================================================
+// DOWNLOAD RIDER CARD
+// ==================================================
+
+try {
+
+    await downloadRiderCard(rider);
+
+} catch (error) {
+
+    console.error(
+        "Rider card generation failed:",
+        error
     );
 
-    localStorage.setItem(
-        "loggedInRider",
-        JSON.stringify(rider)
+    alert(
+        "Registration successful, but Rider Card could not be generated."
     );
+}
 
-    alert("Signup Successful");
 
-    location.href="loginrider.html";
+// ==================================================
+// SUCCESS
+// ==================================================
+
+alert(
+    "FAST GO Rider Registration Successful! 🎉\n\n" +
+    "Your Rider ID: " +
+    rider.riderId +
+    "\n\nYour Rider Card PDF has been downloaded."
+);
+
+
+location.href =
+    "loginrider.html";
 
 });
 
