@@ -1,7 +1,8 @@
+
 /* Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -9,99 +10,231 @@
 }
 
 /* Animated Gradient Background */
-body{
-    height: 100vh;
+body {
+    min-height: 100vh;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(-45deg, #667eea, #764ba2, #6a11cb, #2575fc);
+
+    padding: 20px;
+
+    background: linear-gradient(
+        -45deg,
+        #667eea,
+        #764ba2,
+        #6a11cb,
+        #2575fc
+    );
+
     background-size: 400% 400%;
     animation: gradientBG 10s ease infinite;
 }
 
 /* Background Animation */
 @keyframes gradientBG {
-    0%{ background-position: 0% 50%; }
-    50%{ background-position: 100% 50%; }
-    100%{ background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Glass Card */
-.c1{
-    width: 380px;
+.c1 {
+    width: 100%;
+    max-width: 380px;
+
     background: rgba(255, 255, 255, 0.15);
+
     padding: 40px 30px;
+
     border-radius: 20px;
+
     backdrop-filter: blur(15px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    -webkit-backdrop-filter: blur(15px);
+
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+
     text-align: center;
     color: white;
+
     animation: fadeIn 1s ease-in-out;
 }
 
 /* Card Animation */
-@keyframes fadeIn{
-    from{
+@keyframes fadeIn {
+    from {
         opacity: 0;
         transform: translateY(30px);
     }
-    to{
+
+    to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.c1 p{
+/* Heading / Paragraph */
+.c1 p {
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 20px;
 }
 
 /* Input Styling */
-.c1 input{
+.c1 input {
     width: 100%;
+
     padding: 12px;
+
     margin: 12px 0;
+
     border: none;
     border-radius: 8px;
+
     outline: none;
+
     font-size: 14px;
+
     transition: 0.3s;
 }
 
 /* Input Focus Effect */
-.c1 input:focus{
+.c1 input:focus {
     box-shadow: 0 0 10px #ffffff;
 }
 
 /* Button Styling */
-.c1 button{
+.c1 button {
     width: 100%;
+
     padding: 12px;
+
     margin: 10px 0;
+
     border: none;
     border-radius: 8px;
+
     background: #ffffff;
     color: #333;
+
     font-weight: 600;
+
     cursor: pointer;
+
     transition: 0.3s ease;
 }
 
 /* Button Hover Animation */
-.c1 button:hover{
+.c1 button:hover {
     background: #000;
     color: #fff;
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 
 /* Link Styling */
-.c1 a{
+.c1 a {
     color: #fff;
     text-decoration: none;
     font-weight: 500;
 }
 
-.c1 a:hover{
+.c1 a:hover {
     text-decoration: underline;
 }
+
+
+/* =========================================
+   MOBILE DEVICES
+   ========================================= */
+
+@media (max-width: 480px) {
+
+    body {
+        padding: 15px;
+    }
+
+    .c1 {
+        width: 100%;
+        max-width: 100%;
+
+        padding: 30px 20px;
+
+        border-radius: 16px;
+    }
+
+    .c1 p {
+        font-size: 18px;
+    }
+
+    .c1 input {
+        padding: 11px;
+        font-size: 14px;
+    }
+
+    .c1 button {
+        padding: 11px;
+        font-size: 14px;
+    }
+}
+
+
+/* =========================================
+   TABLETS
+   ========================================= */
+
+@media (min-width: 481px) and (max-width: 768px) {
+
+    body {
+        padding: 20px;
+    }
+
+    .c1 {
+        width: 90%;
+        max-width: 400px;
+
+        padding: 35px 25px;
+    }
+}
+
+
+/* =========================================
+   LAPTOP / PC / MAC
+   ========================================= */
+
+@media (min-width: 769px) {
+
+    .c1 {
+        width: 380px;
+    }
+}
+
+
+/* =========================================
+   LARGE SCREENS
+   ========================================= */
+
+@media (min-width: 1400px) {
+
+    .c1 {
+        max-width: 420px;
+        padding: 45px 35px;
+    }
+
+    .c1 p {
+        font-size: 22px;
+    }
+
+    .c1 input,
+    .c1 button {
+        font-size: 15px;
+    }
+}
+
