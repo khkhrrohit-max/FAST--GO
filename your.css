@@ -1,102 +1,190 @@
+
 /* ===== GLOBAL ===== */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    min-height: 100%;
+}
+
 body {
     margin: 0;
+    width: 100%;
+    min-height: 100vh;
+
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #ff6a00, #ffcc00);
+
+    background: linear-gradient(
+        135deg,
+        #ff6a00,
+        #ffcc00
+    );
+
+    padding: 20px;
 }
+
 
 /* ===== MAIN CONTAINER ===== */
 .dashboard {
+    width: 100%;
     max-width: 900px;
-    margin: 30px auto;
+
+    margin: 10px auto;
+
     background: #ffffff;
+
     padding: 25px;
+
     border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.2);
 }
+
 
 /* ===== HEADER ===== */
 h1 {
     text-align: center;
+
     color: #ff6a00;
+
+    margin-top: 0;
     margin-bottom: 25px;
+
+    word-wrap: break-word;
 }
+
 
 /* ===== ONLINE SECTION ===== */
 .online-section {
     display: flex;
+
     justify-content: space-between;
     align-items: center;
+
+    gap: 15px;
+
     background: #f4f4f4;
+
     padding: 12px 15px;
+
     border-radius: 8px;
+
     margin-bottom: 20px;
 }
 
 #statusText {
     font-weight: bold;
     color: red;
+
+    word-break: break-word;
 }
+
 
 /* ===== PROFILE ===== */
 .profile {
     background: #fafafa;
+
     padding: 15px;
+
     border-radius: 10px;
+
     margin-bottom: 20px;
+
+    overflow: hidden;
 }
 
 .profile p {
     margin: 8px 0;
+
     font-size: 16px;
+
+    word-wrap: break-word;
 }
+
 
 /* ===== STATS SECTION ===== */
 .stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
     gap: 12px;
+
     margin-bottom: 25px;
 }
 
 .stats div {
     background: #f1f1f1;
+
     padding: 15px;
+
     text-align: center;
+
     border-radius: 10px;
+
     font-weight: bold;
+
     font-size: 15px;
+
     transition: 0.3s;
+
+    overflow: hidden;
 }
 
 .stats div:hover {
     transform: translateY(-5px);
+
     background: #ffe0cc;
 }
+
 
 /* ===== RIDE REQUEST BOX ===== */
 .ride-box {
     background: #fff3cd;
+
     padding: 18px;
+
     border-radius: 10px;
+
     margin-bottom: 20px;
+
     border-left: 6px solid #ff6a00;
+
+    overflow: hidden;
 }
 
 .ride-box h3 {
     margin-top: 0;
 }
 
-button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
+.ride-box p {
+    word-wrap: break-word;
 }
 
-/* Buttons */
+
+/* ===== BUTTONS ===== */
+button {
+    padding: 8px 15px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    max-width: 100%;
+}
+
+
+/* ===== ACCEPT ===== */
 #acceptBtn {
     background: #28a745;
     color: white;
@@ -106,6 +194,8 @@ button {
     background: #218838;
 }
 
+
+/* ===== DECLINE ===== */
 #declineBtn {
     background: #dc3545;
     color: white;
@@ -115,9 +205,13 @@ button {
     background: #c82333;
 }
 
+
+/* ===== COMPLETE RIDE ===== */
 #completeRide {
     background: #007bff;
+
     color: white;
+
     margin-bottom: 20px;
 }
 
@@ -125,66 +219,89 @@ button {
     background: #0069d9;
 }
 
+
 /* ===== TABLE ===== */
+.table-container {
+    width: 100%;
+
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+}
+
 table {
     width: 100%;
+
+    min-width: 600px;
+
     border-collapse: collapse;
+
     background: #fafafa;
 }
 
 th {
     background: #ff6a00;
+
     color: white;
+
     padding: 10px;
+
+    white-space: nowrap;
 }
 
 td {
     padding: 10px;
+
     text-align: center;
+
     border-bottom: 1px solid #ddd;
+
+    white-space: nowrap;
 }
 
 tr:hover {
     background: #fff5e6;
 }
 
+
 /* ===== HIDE CLASS ===== */
 .hidden {
     display: none;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
 
-    .dashboard {
-        margin: 10px;
-    }
-}
-
-/* Profile Image Section */
+/* ===== PROFILE IMAGE ===== */
 .profile-top {
     text-align: center;
+
     margin-bottom: 15px;
 }
 
 #profileImage {
     width: 100px;
     height: 100px;
+
+    max-width: 100%;
+
     border-radius: 50%;
+
     object-fit: cover;
+
     border: 3px solid #ff6a00;
+
     margin-bottom: 10px;
 }
 
 #uploadImage {
     display: block;
+
+    max-width: 100%;
+
     margin: 0 auto;
 }
 
-/* Online Status Colors */
+
+/* ===== ONLINE STATUS COLORS ===== */
 .online {
     color: green !important;
 }
@@ -192,7 +309,168 @@ tr:hover {
 .offline {
     color: red !important;
 }
-#deleteBtn{
+
+
+/* ===== DELETE BUTTON ===== */
+#deleteBtn {
     color: #c82333;
+
     border-style: groove;
+
+    max-width: 100%;
 }
+
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    body {
+        padding: 15px;
+    }
+
+    .dashboard {
+        margin: 5px auto;
+
+        padding: 20px;
+
+        border-radius: 12px;
+    }
+
+    .stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 480px) {
+
+    body {
+        padding: 8px;
+    }
+
+    .dashboard {
+        width: 100%;
+
+        margin: 0 auto;
+
+        padding: 15px;
+
+        border-radius: 10px;
+    }
+
+    h1 {
+        font-size: 22px;
+
+        margin-bottom: 20px;
+    }
+
+    .online-section {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        text-align: center;
+
+        padding: 15px;
+    }
+
+    .online-section button {
+        width: 100%;
+    }
+
+    .profile {
+        padding: 12px;
+    }
+
+    .profile p {
+        font-size: 14px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+
+        gap: 8px;
+    }
+
+    .stats div {
+        padding: 12px 5px;
+
+        font-size: 13px;
+    }
+
+    .ride-box {
+        padding: 15px;
+
+        border-left-width: 4px;
+    }
+
+    .ride-box button {
+        width: 100%;
+
+        margin-top: 8px;
+    }
+
+    #profileImage {
+        width: 85px;
+        height: 85px;
+    }
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+   ========================================= */
+
+@media (max-width: 350px) {
+
+    body {
+        padding: 5px;
+    }
+
+    .dashboard {
+        padding: 12px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stats div {
+        padding: 12px;
+    }
+}
+
+
+/* =========================================
+   LARGE SCREENS
+   ========================================= */
+
+@media (min-width: 1400px) {
+
+    .dashboard {
+        max-width: 1000px;
+
+        padding: 30px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+}
+
