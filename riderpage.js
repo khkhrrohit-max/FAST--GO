@@ -374,109 +374,62 @@ document.addEventListener(
 
         function goOnline() {
 
-            if (
-                !navigator.geolocation
-            ) {
+    if (!navigator.geolocation) {
+        alert("Your browser does not support GPS location.");
+        return;
+    }
 
-                alert(
-                    "Your browser does not support GPS location."
+    statusText.textContent = "Getting location...";
+    statusText.style.color = "#ffc107";
+
+    navigator.geolocation.getCurrentPosition(
+
+        function (position) {
+
+            statusText.textContent = "Online";
+            statusText.style.color = "#00ff88";
+
+            toggleStatusBtn.classList.add("online");
+
+            updateRiderLocation(position);
+
+            watchId =
+                navigator.geolocation.watchPosition(
+                    function (newPosition) {
+                        updateRiderLocation(newPosition);
+                    },
+                    function (error) {
+                        console.error("GPS error:", error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        maximumAge: 2000,
+                        timeout: 10000
+                    }
                 );
+        },
 
-                return;
-            }
+        function (error) {
 
+            console.error(error);
 
-            statusText.textContent =
-                "Getting location...";
+            statusText.textContent = "Offline";
+            statusText.style.color = "#ff4d4d";
 
+            toggleStatusBtn.classList.remove("online");
 
-            navigator.geolocation.getCurrentPosition(
-
-                function (position) {
-
-                    statusText.textContent =
-                        "Online";
-
-
-                    statusText.style.color =
-                        "green";
-
-
-                    toggleStatusBtn.textContent =
-                        "Go Offline";
-
-
-                    updateRiderLocation(
-                        position
-                    );
-
-
-                    watchId =
-                        navigator.geolocation.watchPosition(
-
-                            function (newPosition) {
-
-                                updateRiderLocation(
-                                    newPosition
-                                );
-                            },
-
-                            function (error) {
-
-                                console.error(
-                                    "GPS error:",
-                                    error
-                                );
-                            },
-
-                            {
-
-                                enableHighAccuracy:
-                                    true,
-
-                                maximumAge:
-                                    2000,
-
-                                timeout:
-                                    10000
-
-                            }
-                        );
-                },
-
-
-                function (error) {
-
-                    console.error(
-                        error
-                    );
-
-
-                    statusText.textContent =
-                        "Offline";
-
-
-                    alert(
-                        "Location permission is required to go online."
-                    );
-                },
-
-
-                {
-
-                    enableHighAccuracy:
-                        true,
-
-                    timeout:
-                        15000,
-
-                    maximumAge:
-                        0
-
-                }
+            alert(
+                "Location permission is required to go online."
             );
-        }
+        },
 
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+    );
+}
 
         // ==================================================
         // UPDATE RIDER LOCATION
@@ -558,48 +511,35 @@ document.addEventListener(
         // GO OFFLINE
         // ==================================================
 
-        function goOffline() {
+    function goOffline() {
 
-            if (
-                watchId !== null
-            ) {
+    if (watchId !== null) {
 
-                navigator.geolocation.clearWatch(
-                    watchId
-                );
+        navigator.geolocation.clearWatch(
+            watchId
+        );
 
-                watchId =
-                    null;
-            }
+        watchId = null;
+    }
 
+    localStorage.removeItem(
+        activeRiderKey
+    );
 
-            localStorage.removeItem(
-                activeRiderKey
-            );
+    statusText.textContent = "Offline";
+    statusText.style.color = "#ff4d4d";
 
+    toggleStatusBtn.classList.remove("online");
 
-            statusText.textContent =
-                "Offline";
+    if (riderMarker) {
 
+        map.removeLayer(
+            riderMarker
+        );
 
-            statusText.style.color =
-                "red";
-
-
-            toggleStatusBtn.textContent =
-                "Go Online";
-
-
-            if (riderMarker) {
-
-                map.removeLayer(
-                    riderMarker
-                );
-
-                riderMarker =
-                    null;
-            }
-        }
+        riderMarker = null;
+    }
+}
 
 
         // ==================================================
@@ -1363,23 +1303,16 @@ document.addEventListener(
             );
 
 
-        if (
-            savedRider &&
-            savedRider.online === true
-        ) {
+       if (
+    savedRider &&
+    savedRider.online === true
+) {
 
-            /*
-             * Do not automatically start GPS.
-             * Browser permission should be
-             * triggered by button click.
-             */
+    statusText.textContent =
+        "Offline";
 
-            statusText.textContent =
-                "Offline";
-
-            toggleStatusBtn.textContent =
-                "Go Online";
-        }
+    toggleStatusBtn.classList.remove("online");
+}
 
     }
 );
