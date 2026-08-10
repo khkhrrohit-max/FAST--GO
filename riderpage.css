@@ -1,138 +1,260 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+
+/* ======================================================
+   FAST GO RIDER PAGE - RESPONSIVE CSS
+   Works on PC, Laptop, Mac, Tablet & Mobile
+====================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
 
-body{
-    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    color:white;
+html {
+    width: 100%;
+    overflow-x: hidden;
 }
 
-/* Navbar */
-.navbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px 40px;
-    background:black;
+body {
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+    overflow-x: hidden;
 }
 
-.logo{
-    display:flex;
-    align-items:center;
+
+/* ======================================================
+   NAVBAR
+====================================================== */
+
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 15px clamp(15px, 4vw, 40px);
+    background: black;
+    flex-wrap: wrap;
 }
 
-.logo img{
-    width:40px;
-    margin-right:10px;
+.logo {
+    display: flex;
+    align-items: center;
+    min-width: 0;
 }
 
-nav a{
-    color:white;
-    text-decoration:none;
-    margin-left:20px;
-    transition:0.3s;
+.logo img {
+    width: clamp(35px, 4vw, 45px);
+    height: auto;
+    margin-right: 10px;
 }
 
-nav a:hover{
-    color:#00c6ff;
+.logo h2 {
+    font-size: clamp(17px, 2vw, 25px);
+    white-space: nowrap;
 }
 
-/* Hero */
-.hero{
-    text-align:center;
-    padding:80px 20px;
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.rider-box{
-    margin-top:30px;
-    background:rgba(255,255,255,0.1);
-    padding:20px;
-    border-radius:10px;
-    display:inline-block;
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: clamp(5px, 1.5vw, 20px);
+    font-size: clamp(13px, 1.4vw, 16px);
+    transition: 0.3s;
 }
 
-.rider-box button{
-    margin-top:15px;
-    padding:10px 20px;
-    border:none;
-    border-radius:20px;
-    background:#00c6ff;
-    cursor:pointer;
+nav a:hover {
+    color: #00c6ff;
 }
 
-/* Rides */
-.rides{
-    padding:50px;
-    text-align:center;
+
+/* ======================================================
+   HERO
+====================================================== */
+
+.hero {
+    width: 100%;
+    text-align: center;
+    padding: clamp(45px, 8vw, 80px) 15px;
 }
 
-.ride-card{
-    background:rgba(255,255,255,0.1);
-    margin:20px auto;
-    padding:20px;
-    width:300px;
-    border-radius:10px;
+.hero h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    line-height: 1.2;
 }
 
-.ride-card button{
-    margin-top:10px;
-    padding:8px 15px;
-    border:none;
-    border-radius:15px;
-    background:#0072ff;
-    color:white;
-    cursor:pointer;
+.hero p {
+    font-size: clamp(15px, 2vw, 20px);
+    margin-top: 12px;
 }
 
-/* Footer */
-footer{
-    text-align:center;
-    padding:20px;
-    background:black;
-    margin-top:40px;
+
+/* ======================================================
+   RIDER STATUS BOX
+====================================================== */
+
+.rider-box {
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: clamp(18px, 4vw, 25px);
+    border-radius: 12px;
+    width: min(90%, 400px);
 }
 
-/* ================= WALLET DESIGN ================= */
+.rider-box h3 {
+    font-size: clamp(18px, 3vw, 24px);
+}
+
+.rider-box button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #00c6ff;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.rider-box button:hover {
+    background: #0072ff;
+    color: white;
+}
+
+
+/* ======================================================
+   MAP
+====================================================== */
+
+#mapContainer {
+    width: min(95%, 1100px) !important;
+    height: clamp(300px, 50vw, 500px) !important;
+    margin: 20px auto !important;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+
+/* ======================================================
+   RIDES SECTION
+====================================================== */
+
+.rides {
+    width: 100%;
+    padding: clamp(30px, 6vw, 60px) 15px;
+    text-align: center;
+}
+
+.rides h2 {
+    font-size: clamp(25px, 4vw, 38px);
+    margin-bottom: 20px;
+}
+
+
+/* ======================================================
+   RIDE CARD
+====================================================== */
+
+.ride-card {
+    background: rgba(255, 255, 255, 0.12);
+    margin: 20px auto;
+    padding: clamp(18px, 4vw, 28px);
+    width: min(92%, 500px);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+    text-align: left;
+    word-wrap: break-word;
+}
+
+.ride-card h3 {
+    font-size: clamp(19px, 3vw, 26px);
+    margin-bottom: 15px;
+}
+
+.ride-card p {
+    font-size: clamp(14px, 2vw, 17px);
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.ride-card button {
+    margin-top: 10px;
+    margin-right: 8px;
+    padding: 9px 15px;
+    border: none;
+    border-radius: 15px;
+    background: #0072ff;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.ride-card button:hover {
+    background: #00c6ff;
+    color: black;
+}
+
+
+/* ======================================================
+   WALLET
+====================================================== */
 
 .wallet-card {
+    width: min(92%, 400px);
     text-align: center;
     background: #ffffff;
-    padding: 20px;
-    margin: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    max-width: 350px;
+    color: #333;
+    padding: clamp(18px, 4vw, 25px);
+    margin: 20px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .wallet-card h2 {
     text-align: center;
     margin-bottom: 20px;
+    font-size: clamp(20px, 4vw, 27px);
     color: #333;
+}
+
+.wallet-card p {
+    font-size: clamp(14px, 2vw, 17px);
 }
 
 .wallet-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
 #walletBalance {
-    font-size: 20px;
+    font-size: clamp(18px, 4vw, 24px);
     font-weight: bold;
 }
 
 #companyBalance {
-    font-size: 18px;
+    font-size: clamp(16px, 3vw, 20px);
     font-weight: bold;
     color: #444;
 }
 
 #rechargeBtn {
     width: 100%;
-    padding: 10px;
+    padding: 11px;
     border: none;
     border-radius: 8px;
     background: #28a745;
@@ -145,41 +267,355 @@ footer{
 #rechargeBtn:hover {
     background: #218838;
 }
-/* ================= MAP ROUTE VISIBILITY FIX ================= */
 
-/* Route line color */
+
+/* ======================================================
+   LEAFLET ROUTING CONTAINER
+====================================================== */
+
 .leaflet-routing-container {
-    background: rgba(0, 0, 0, 0.85) !important;
+    background: rgba(0, 0, 0, 0.88) !important;
     color: white !important;
     border-radius: 10px;
+    max-width: min(90vw, 350px);
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
-/* Routing instructions text */
 .leaflet-routing-container h2,
 .leaflet-routing-container h3,
 .leaflet-routing-container table {
     color: white !important;
 }
 
-/* Arrow icons */
-.leaflet-routing-icon {
-    filter: invert(1); /* makes white arrow black */
+.leaflet-routing-container td,
+.leaflet-routing-container th {
+    color: white !important;
 }
 
-/* Route line styling */
+.leaflet-routing-icon {
+    filter: invert(1);
+}
+
 .leaflet-routing-line {
-    stroke: #00ffcc !important;   /* bright cyan */
+    stroke: #00ffcc !important;
     stroke-width: 6 !important;
 }
 
-/* Alternative route */
 .leaflet-routing-alt {
-    background: rgba(255,255,255,0.1) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
     color: white !important;
 }
 
-/* Zoom control visibility */
+
+/* ======================================================
+   LEAFLET ZOOM CONTROL
+====================================================== */
+
 .leaflet-control-zoom a {
     background: black !important;
     color: white !important;
+}
+
+
+/* ======================================================
+   FOOTER
+====================================================== */
+
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 20px 15px;
+    background: black;
+    margin-top: 40px;
+}
+
+footer p {
+    font-size: clamp(12px, 1.5vw, 16px);
+    margin: 5px 0;
+}
+
+
+/* ======================================================
+   TABLET
+====================================================== */
+
+@media (max-width: 900px) {
+
+    .navbar {
+        justify-content: center;
+    }
+
+    .logo {
+        width: 100%;
+        justify-content: center;
+    }
+
+    nav {
+        width: 100%;
+    }
+
+    nav a {
+        margin: 5px 8px;
+    }
+
+}
+
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media (max-width: 600px) {
+
+    .navbar {
+        padding: 12px 10px;
+        gap: 10px;
+    }
+
+    .logo h2 {
+        font-size: 18px;
+    }
+
+    nav {
+        gap: 3px;
+    }
+
+    nav a {
+        font-size: 12px;
+        margin: 4px 5px;
+    }
+
+    .hero {
+        padding: 40px 10px;
+    }
+
+    .rider-box {
+        width: 95%;
+    }
+
+    .ride-card {
+        width: 95%;
+    }
+
+    .ride-card button {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    #mapContainer {
+        width: 95% !important;
+        height: 350px !important;
+    }
+
+    .leaflet-routing-container {
+        max-width: 75vw;
+        font-size: 12px;
+    }
+
+}
+
+
+/* ======================================================
+   VERY SMALL MOBILE
+====================================================== */
+
+@media (max-width: 380px) {
+
+    .logo h2 {
+        font-size: 16px;
+    }
+
+    nav a {
+        font-size: 11px;
+        margin: 3px;
+    }
+
+    .hero h1 {
+        font-size: 26px;
+    }
+
+    #mapContainer {
+        height: 300px !important;
+    }
+
+    .wallet-card,
+    .ride-card,
+    .rider-box {
+        width: 94%;
+    }
+
+}
+
+
+/* ======================================================
+   FAST GO ONLINE / OFFLINE SWIPE SWITCH
+====================================================== */
+
+.online-switch-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.status-text {
+    font-size: 17px;
+    font-weight: bold;
+    color: #ff4d4d;
+    min-width: 65px;
+    text-align: right;
+}
+
+
+/* Switch */
+
+.online-switch {
+    position: relative;
+    width: 64px;
+    height: 34px;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    border-radius: 50px;
+
+    background: #555;
+
+    cursor: pointer;
+
+    transition: 0.35s ease;
+
+    box-shadow:
+        inset 0 2px 5px rgba(0,0,0,0.35),
+        0 3px 10px rgba(0,0,0,0.25);
+}
+
+
+/* Circle */
+
+.switch-circle {
+    position: absolute;
+
+    width: 26px;
+    height: 26px;
+
+    top: 4px;
+    left: 4px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+
+    transition: 0.35s ease;
+}
+
+
+/* ONLINE */
+
+.online-switch.online {
+    background: #00c853;
+}
+
+.online-switch.online .switch-circle {
+    transform: translateX(30px);
+}
+
+
+/* Hover */
+
+.online-switch:hover {
+    transform: scale(1.05);
+}
+
+
+/* Click effect */
+
+.online-switch:active {
+    transform: scale(0.96);
+}
+
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media (max-width: 600px) {
+
+    .online-switch-wrapper {
+        gap: 10px;
+    }
+
+    .online-switch {
+        width: 58px;
+        height: 32px;
+    }
+
+    .switch-circle {
+        width: 24px;
+        height: 24px;
+
+        top: 4px;
+        left: 4px;
+    }
+
+    .online-switch.online .switch-circle {
+        transform: translateX(26px);
+    }
+
+    .status-text {
+        font-size: 15px;
+    }
+}
+
+.online-switch-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.status-text {
+    min-width: 65px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: right;
+    color: #ff4d4d;
+}
+
+.online-switch {
+    position: relative;
+    width: 64px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 50px;
+    background: #555;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.switch-circle {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    top: 4px;
+    left: 4px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s ease;
+}
+
+.online-switch.online {
+    background: #00c853;
+}
+
+.online-switch.online .switch-circle {
+    transform: translateX(30px);
 }
